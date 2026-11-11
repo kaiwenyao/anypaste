@@ -137,11 +137,10 @@ enum Diagnostics {
 
     static func saveEndToEnd(_ payload: [String: String], ok: Bool) {
         AppInfo.ensureDirectories()
-        var merged = payload
-        merged["ok"] = ok ? "true" : "false"
-        let lines = merged.keys.sorted().map { "\"\($0)\": \"\(merged[$0] ?? "")\"" }.joined(separator: ",\n  ")
-        let text = "{\n  \(lines)\n}\n"
-        let url = AppInfo.logDirectory.appendingPathComponent("e2e-last.json")
-        try? text.data(using: .utf8)?.write(to: url)
+        var merged: [String: Any] = payload
+        merged["ok"] = ok
+        let data = (try? JSONSerialization.data(withJSONObject: merged, options: [.prettyPrinted, .sortedKeys]))
+            ?? Data("{\"ok\":false}".utf8)
+        try? data.write(to: AppInfo.logDirectory.appendingPathComponent("e2e-last.json"))
     }
 }

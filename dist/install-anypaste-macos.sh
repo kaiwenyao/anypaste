@@ -11,7 +11,7 @@
 set -Eeuo pipefail
 
 REPO="kaiwenyao/anypaste"
-BASE_URL="https://github.com/${REPO}/releases/latest/download"
+BASE_URL=""   # resolved at runtime (see resolve_base)
 ASSET_ZIP="AnyPaste-macos.zip"
 ASSET_SUM="AnyPaste-macos.zip.sha256"
 
@@ -52,8 +52,8 @@ msg() {
             cn="[2/5] 正在校验 SHA-256 与应用包…"
             ;;
         signing)
-            en="[3/5] Signing with a local identity (no Apple account required)…"
-            cn="[3/5] 正在用本地签名身份签名(无需 Apple 开发者账号)…"
+            en="[3/5] Signing the app locally (no Apple account required)…"
+            cn="[3/5] 正在本地签名(无需 Apple 开发者账号)…"
             ;;
         installing)
             en="[4/5] Installing into %s…"
@@ -187,6 +187,24 @@ select_language() {
 
 macos_major() {
     sw_vers -productVersion 2>/dev/null | cut -d. -f1
+}
+
+# Resolve the newest release tag through the API and download from that
+# immutable tag URL. Falling back to /releases/latest/download covers rate
+# limits; the direct tag URL avoids stale CDN redirects for "latest".
+resolve_base() {
+    local tag=""
+    if command -v curl >/dev/null 2>&1; then
+        tag=$(curl --fail --silent --show-error --location --max-time 20 \
+            --proto '=https' --proto-redir '=https' \
+            "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
+            | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -1)
+    fi
+    if [ -n "$tag" ]; then
+        printf 'https://github.com/%s/releases/download/%s\n' "$REPO" "$tag"
+    else
+        printf 'https://github.com/%s/releases/latest/download\n' "$REPO"
+    fi
 }
 
 fetch() {
@@ -377,6 +395,7 @@ install_app() {
         fi
     else
         say downloading
+        BASE_URL=$(resolve_base)
         fetch "$BASE_URL/$ASSET_ZIP" "$work/$ASSET_ZIP" || die download_failed
         fetch "$BASE_URL/$ASSET_SUM" "$work/$ASSET_SUM" || die download_failed
         source_zip="$work/$ASSET_ZIP"

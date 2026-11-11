@@ -51,9 +51,11 @@ struct OnboardingView: View {
                     }
                 }
 
-                Text("在「隐私与安全性 → 辅助功能」中勾选 AnyPaste,然后回到这里 —— 状态会自动刷新。")
+                Text("在「隐私与安全性 → 辅助功能」中勾选 AnyPaste,然后回到这里 —— 状态会自动刷新。"
+                     + "若已勾选仍显示未授权,请退出并重新打开 AnyPaste(部分 macOS 版本需要重启应用或重新登录后才生效)。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 if let message = controller.hotKeyError {
                     Text(message)
