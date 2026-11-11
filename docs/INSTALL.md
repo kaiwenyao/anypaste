@@ -86,6 +86,7 @@ bash install-anypaste-macos.sh --uninstall
 | 现象 | 处理 |
 |---|---|
 | 按 `⌃⇧V` 没反应 | 检查「辅助功能」是否勾选;设置 → 权限与诊断 里可看到实时状态 |
+| 已在系统设置勾选,应用仍显示未授权 | 先退出并重新打开 AnyPaste;若仍无效,重启(或重新登录)一次再试 —— 个别 macOS 版本对授权变更的生效时机有延迟 |
 | 输入丢字 | 把每字延迟调到 5–10 ms(远程桌面、Electron 应用常见) |
 | 菜单栏看不到图标 | 系统限制;应用会自动在 Dock 显示入口,详见 README「已知限制」 |
 | 签名身份损坏 | `bash install-anypaste-macos.sh --uninstall` 后重装,会重新生成身份(需重新授权) |
