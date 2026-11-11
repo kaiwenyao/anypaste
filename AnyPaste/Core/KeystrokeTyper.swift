@@ -30,6 +30,8 @@ final class KeystrokeTyper {
     private let stateLock = NSLock()
     private var running = false
     private var cancelRequested = false
+    private var globalEscapeMonitor: Any?
+    private var localEscapeMonitor: Any?
 
     private init() {}
 
@@ -58,6 +60,8 @@ final class KeystrokeTyper {
         cancelRequested = false
         stateLock.unlock()
 
+        installEscapeMonitors()
+
         queue.async { [weak self] in
             guard let self else { return }
             let result = self.perform(text: text, delayMs: delayMs, layout: layout, progress: progress)
@@ -65,6 +69,7 @@ final class KeystrokeTyper {
             self.running = false
             self.cancelRequested = false
             self.stateLock.unlock()
+            self.removeEscapeMonitors()
             DispatchQueue.main.async { completion(result) }
         }
         return true
@@ -77,6 +82,41 @@ final class KeystrokeTyper {
     }
 
     // MARK: - Private
+
+    /// Escape aborts a run. A key event monitor catches both real and injected
+    /// key presses; the hardware key-state poll below stays as a safety net for
+    /// the case where the monitor could not be installed.
+    private func installEscapeMonitors() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if self.globalEscapeMonitor == nil {
+                self.globalEscapeMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown]) { [weak self] event in
+                    if event.keyCode == 53 { self?.cancel() }
+                }
+            }
+            if self.localEscapeMonitor == nil {
+                self.localEscapeMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown]) { [weak self] event in
+                    guard event.keyCode == 53 else { return event }
+                    self?.cancel()
+                    return nil
+                }
+            }
+        }
+    }
+
+    private func removeEscapeMonitors() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if let monitor = self.globalEscapeMonitor {
+                NSEvent.removeMonitor(monitor)
+                self.globalEscapeMonitor = nil
+            }
+            if let monitor = self.localEscapeMonitor {
+                NSEvent.removeMonitor(monitor)
+                self.localEscapeMonitor = nil
+            }
+        }
+    }
 
     private func isCancelRequested() -> Bool {
         stateLock.lock()

@@ -56,6 +56,9 @@ final class AppController: ObservableObject {
         if !visible {
             HUDWindow.show("菜单栏图标未显示,已启用 Dock 图标作为入口")
         }
+        // Changing the activation policy can invalidate the Carbon hotkey
+        // registration on some macOS builds, so register again.
+        DispatchQueue.main.async { [weak self] in self?.applyHotKey() }
     }
 
     func startPermissionPolling() {
@@ -72,6 +75,8 @@ final class AppController: ObservableObject {
         if granted != permissionGranted {
             permissionGranted = granted
             AppLog.info("辅助功能授权状态变更为 \(granted)")
+            // A permission transition can also drop the hotkey registration.
+            applyHotKey()
         }
     }
 
