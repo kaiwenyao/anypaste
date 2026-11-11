@@ -52,31 +52,59 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         }
     }
 
-    /// macOS writes `NSStatusItem Preferred Position …` into the app's own
-    /// preferences once it lays the item out. If that never happens the menu bar
-    /// is not presenting items (seen on some macOS builds), so the app falls back
-    /// to a Dock icon instead of becoming unreachable.
+    /// A status item is really on screen when its button window sits inside the
+    /// menu bar strip with a normal height. AppKit additionally records an
+    /// `NSStatusItem Preferred Position …` default once the item is laid out, so
+    /// either signal counts as "presented".
+    ///
+    /// Some macOS builds never present new status items (observed on 27.x);
+    /// in that case the app falls back to a Dock icon instead of becoming
+    /// unreachable. The check keeps running for a while so the app recovers on
+    /// its own once the system starts presenting the item again.
     private func scheduleAvailabilityChecks() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
-            self?.evaluateMenuBarAvailability()
+        for seconds in [2.0, 5.0, 10.0, 20.0, 45.0, 90.0] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + seconds) { [weak self] in
+                self?.evaluateMenuBarAvailability()
+            }
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 8.0) { [weak self] in
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(screenConfigurationChanged),
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
+    }
+
+    @objc private func screenConfigurationChanged() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.evaluateMenuBarAvailability()
         }
     }
 
     private func evaluateMenuBarAvailability() {
-        CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
-        let bundleID = Bundle.main.bundleIdentifier ?? AppInfo.bundleIdentifier
-        let domain = UserDefaults.standard.persistentDomain(forName: bundleID) ?? [:]
-        let laidOut = domain.keys.contains { $0.hasPrefix("NSStatusItem Preferred Position") }
+        var presented = false
 
-        if laidOut {
-            AppController.shared.setMenuBarItemVisible(true)
-            return
+        if let button = statusItem?.button, let window = button.window {
+            let frame = window.frame
+            if let screen = window.screen ?? NSScreen.main {
+                let insideMenuBar = frame.maxY >= screen.frame.maxY - 6 && frame.maxY <= screen.frame.maxY + 6
+                presented = frame.height >= 18 && insideMenuBar && window.isVisible
+            }
         }
-        AppLog.info("菜单栏布局检测:状态项未排布,启用 Dock 图标备用入口")
-        AppController.shared.setMenuBarItemVisible(false)
+
+        if !presented {
+            CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
+            let bundleID = Bundle.main.bundleIdentifier ?? AppInfo.bundleIdentifier
+            let domain = UserDefaults.standard.persistentDomain(forName: bundleID) ?? [:]
+            presented = domain.keys.contains { $0.hasPrefix("NSStatusItem Preferred Position") }
+        }
+
+        if presented {
+            AppController.shared.setMenuBarItemVisible(true)
+        } else {
+            AppLog.info("菜单栏布局检测:状态项未排布,启用 Dock 图标备用入口")
+            AppController.shared.setMenuBarItemVisible(false)
+        }
     }
 
     private func observe() {
