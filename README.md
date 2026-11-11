@@ -41,9 +41,13 @@ curl -fL --proto '=https' --proto-redir '=https' \
 
 ## 截图
 
-| 首次引导 | 设置 |
+| 菜单栏菜单 | 设置 |
 |---|---|
-| ![引导](docs/images/onboarding.png) | ![设置](docs/images/settings.png) |
+| ![菜单](docs/images/menu.png) | ![设置](docs/images/settings.png) |
+
+| 首次引导 |
+|---|
+| ![引导](docs/images/onboarding.png) |
 
 ## 从源码构建
 
