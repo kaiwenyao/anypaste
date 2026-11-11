@@ -1,0 +1,11 @@
+# 构建产物
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# 原始样本不随仓库分发(第三方 AutoHotkey 解释器二进制)
+AnyPaste.exe
+
+# 系统文件
+.DS_Store

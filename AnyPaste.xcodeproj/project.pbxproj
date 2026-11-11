@@ -1,0 +1,361 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		447DE4F0F68D67F517D07EBF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1196C54B1BFF87C82479D22A /* main.swift */; };
+		017CC6F86454321D6D579F43 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783EC7CAE7D0D0D827FDEDBF /* AppDelegate.swift */; };
+		CCA6A2AF748A8583259AD23D /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55CE6D68B6A6570A44996E7 /* AppInfo.swift */; };
+		8653994DE17AF3E6CBBD92FD /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643EB42C40AEAD790C5FACF1 /* Prefs.swift */; };
+		CBE5893751F372710E8C8F45 /* KeyboardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0994620972F3F687CE7995C8 /* KeyboardLayout.swift */; };
+		EC5B8D374F45F5C520FDBEEB /* KeystrokePlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374ABDC3424A4E157243A3F2 /* KeystrokePlanner.swift */; };
+		A941960A8B37D7994F014CC1 /* KeystrokeTyper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A3CBCC3D400999152680285 /* KeystrokeTyper.swift */; };
+		4553155A8042A3EDAD25DDCF /* HotKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD9ADAA05CEFE498939300D4 /* HotKeyManager.swift */; };
+		4085192B2560586792256DE2 /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8531E41F4EB0AA43EF08D8F9 /* ClipboardService.swift */; };
+		7E836AB67395CBC873E40586 /* PermissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41FAE0B027A43B7295AB932F /* PermissionService.swift */; };
+		6394BEF1055399F29312F447 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B815592DED73EB5EC0FA6569 /* LaunchAtLogin.swift */; };
+		FA6DD3500301ED80037F2CDD /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1D3B8CA159E5A77FB39D31 /* AppController.swift */; };
+		5620F45ECFC5C1B341396D24 /* Diagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6FE7709D51D617252E855 /* Diagnostics.swift */; };
+		152211E2816F58A739F7C951 /* HUDWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7933CC4F17C850C4CF91A7A7 /* HUDWindow.swift */; };
+		1EB5A31D5150F12597CAFF33 /* AppWindows.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF2851C47E729E4E5B6699F /* AppWindows.swift */; };
+		1F79F10025CD86C0A21D8F22 /* StatusItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D177F464941F4532EAD4180 /* StatusItemController.swift */; };
+		9B4AC94107D133A923A925EB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7C576A8DC01757C2DE2D25 /* SettingsView.swift */; };
+		048DE43D2A282515ED1069E5 /* HotKeySettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = F427196B3B6D0AB0747E5B88 /* HotKeySettingsTab.swift */; };
+		07042153650ABF829B97C7E8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCACD96FB2EB2135A6027C52 /* OnboardingView.swift */; };
+		2257CF40C95C10B2A6E2482F /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9E295975EA5230AE42756280 /* AppIcon.icns */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A97C29AD63741CF438998CE6 /* AnyPaste.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AnyPaste.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D815DD2BB41FEA1DA45DC65 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1196C54B1BFF87C82479D22A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		783EC7CAE7D0D0D827FDEDBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B55CE6D68B6A6570A44996E7 /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
+		643EB42C40AEAD790C5FACF1 /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
+		0994620972F3F687CE7995C8 /* KeyboardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardLayout.swift; sourceTree = "<group>"; };
+		374ABDC3424A4E157243A3F2 /* KeystrokePlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeystrokePlanner.swift; sourceTree = "<group>"; };
+		6A3CBCC3D400999152680285 /* KeystrokeTyper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeystrokeTyper.swift; sourceTree = "<group>"; };
+		BD9ADAA05CEFE498939300D4 /* HotKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyManager.swift; sourceTree = "<group>"; };
+		8531E41F4EB0AA43EF08D8F9 /* ClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardService.swift; sourceTree = "<group>"; };
+		41FAE0B027A43B7295AB932F /* PermissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionService.swift; sourceTree = "<group>"; };
+		B815592DED73EB5EC0FA6569 /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
+		DA1D3B8CA159E5A77FB39D31 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
+		C7B6FE7709D51D617252E855 /* Diagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics.swift; sourceTree = "<group>"; };
+		7933CC4F17C850C4CF91A7A7 /* HUDWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDWindow.swift; sourceTree = "<group>"; };
+		FAF2851C47E729E4E5B6699F /* AppWindows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppWindows.swift; sourceTree = "<group>"; };
+		2D177F464941F4532EAD4180 /* StatusItemController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemController.swift; sourceTree = "<group>"; };
+		BB7C576A8DC01757C2DE2D25 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F427196B3B6D0AB0747E5B88 /* HotKeySettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeySettingsTab.swift; sourceTree = "<group>"; };
+		FCACD96FB2EB2135A6027C52 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		9E295975EA5230AE42756280 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		29B2D46AA747A59804D46E1F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5928955287B8089ED2177128 = {
+			isa = PBXGroup;
+			children = (
+				095FEE2E633C50D24407F2D6 /* AnyPaste */,
+				BF7A2D27A78D590BDEF15AF2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		095FEE2E633C50D24407F2D6 /* AnyPaste */ = {
+			isa = PBXGroup;
+			children = (
+				D1D0524B025E57AFFF263442 /* App */,
+				35D315DEBBF45F223B169A61 /* Core */,
+				C71E237AED0167A15E00637D /* UI */,
+				887A6F90336FF23D95C3914B /* Resources */,
+				4D815DD2BB41FEA1DA45DC65 /* Info.plist */,
+			);
+			path = AnyPaste;
+			sourceTree = "<group>";
+		};
+		D1D0524B025E57AFFF263442 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				1196C54B1BFF87C82479D22A /* main.swift */,
+				783EC7CAE7D0D0D827FDEDBF /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		35D315DEBBF45F223B169A61 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				B55CE6D68B6A6570A44996E7 /* AppInfo.swift */,
+				643EB42C40AEAD790C5FACF1 /* Prefs.swift */,
+				0994620972F3F687CE7995C8 /* KeyboardLayout.swift */,
+				374ABDC3424A4E157243A3F2 /* KeystrokePlanner.swift */,
+				6A3CBCC3D400999152680285 /* KeystrokeTyper.swift */,
+				BD9ADAA05CEFE498939300D4 /* HotKeyManager.swift */,
+				8531E41F4EB0AA43EF08D8F9 /* ClipboardService.swift */,
+				41FAE0B027A43B7295AB932F /* PermissionService.swift */,
+				B815592DED73EB5EC0FA6569 /* LaunchAtLogin.swift */,
+				DA1D3B8CA159E5A77FB39D31 /* AppController.swift */,
+				C7B6FE7709D51D617252E855 /* Diagnostics.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		C71E237AED0167A15E00637D /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				7933CC4F17C850C4CF91A7A7 /* HUDWindow.swift */,
+				FAF2851C47E729E4E5B6699F /* AppWindows.swift */,
+				2D177F464941F4532EAD4180 /* StatusItemController.swift */,
+				BB7C576A8DC01757C2DE2D25 /* SettingsView.swift */,
+				F427196B3B6D0AB0747E5B88 /* HotKeySettingsTab.swift */,
+				FCACD96FB2EB2135A6027C52 /* OnboardingView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		887A6F90336FF23D95C3914B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9E295975EA5230AE42756280 /* AppIcon.icns */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		BF7A2D27A78D590BDEF15AF2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A97C29AD63741CF438998CE6 /* AnyPaste.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		42AEFBAE01D2DFD981F7DA7D /* AnyPaste */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F707ED8CFBC457F7F618ECA6 /* Build configuration list for PBXNativeTarget "AnyPaste" */;
+			buildPhases = (
+				E7209FB05162B7572F88D05E /* Sources */,
+				29B2D46AA747A59804D46E1F /* Frameworks */,
+				66F8606E9F0A136E2228EBCB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AnyPaste;
+			productName = AnyPaste;
+			productReference = A97C29AD63741CF438998CE6 /* AnyPaste.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					42AEFBAE01D2DFD981F7DA7D = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 9D908D8792E5642B2623649E /* Build configuration list for PBXProject "AnyPaste" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5928955287B8089ED2177128;
+			productRefGroup = BF7A2D27A78D590BDEF15AF2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				42AEFBAE01D2DFD981F7DA7D /* AnyPaste */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		66F8606E9F0A136E2228EBCB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2257CF40C95C10B2A6E2482F /* AppIcon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E7209FB05162B7572F88D05E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				447DE4F0F68D67F517D07EBF /* main.swift in Sources */,
+				017CC6F86454321D6D579F43 /* AppDelegate.swift in Sources */,
+				CCA6A2AF748A8583259AD23D /* AppInfo.swift in Sources */,
+				8653994DE17AF3E6CBBD92FD /* Prefs.swift in Sources */,
+				CBE5893751F372710E8C8F45 /* KeyboardLayout.swift in Sources */,
+				EC5B8D374F45F5C520FDBEEB /* KeystrokePlanner.swift in Sources */,
+				A941960A8B37D7994F014CC1 /* KeystrokeTyper.swift in Sources */,
+				4553155A8042A3EDAD25DDCF /* HotKeyManager.swift in Sources */,
+				4085192B2560586792256DE2 /* ClipboardService.swift in Sources */,
+				7E836AB67395CBC873E40586 /* PermissionService.swift in Sources */,
+				6394BEF1055399F29312F447 /* LaunchAtLogin.swift in Sources */,
+				FA6DD3500301ED80037F2CDD /* AppController.swift in Sources */,
+				5620F45ECFC5C1B341396D24 /* Diagnostics.swift in Sources */,
+				152211E2816F58A739F7C951 /* HUDWindow.swift in Sources */,
+				1EB5A31D5150F12597CAFF33 /* AppWindows.swift in Sources */,
+				1F79F10025CD86C0A21D8F22 /* StatusItemController.swift in Sources */,
+				9B4AC94107D133A923A925EB /* SettingsView.swift in Sources */,
+				048DE43D2A282515ED1069E5 /* HotKeySettingsTab.swift in Sources */,
+				07042153650ABF829B97C7E8 /* OnboardingView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		189D56DE85F89520581145D8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+									"DEBUG=1",
+									"$(inherited)",
+								);
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		30547E9EC5F49CB55604B54F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				ARCHS = (
+									arm64,
+									x86_64,
+								);
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		339F2120A275E8028CC42767 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AnyPaste/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+									"$(inherited)",
+									"@executable_path/../Frameworks",
+								);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anypaste.mac;
+				PRODUCT_NAME = AnyPaste;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		17234DA728CB8FFFA593E13A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AnyPaste/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+									"$(inherited)",
+									"@executable_path/../Frameworks",
+								);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anypaste.mac;
+				PRODUCT_NAME = AnyPaste;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9D908D8792E5642B2623649E /* Build configuration list for PBXProject "AnyPaste" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				189D56DE85F89520581145D8 /* Debug */,
+				30547E9EC5F49CB55604B54F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F707ED8CFBC457F7F618ECA6 /* Build configuration list for PBXNativeTarget "AnyPaste" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				339F2120A275E8028CC42767 /* Debug */,
+				17234DA728CB8FFFA593E13A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}
