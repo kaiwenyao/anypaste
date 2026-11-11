@@ -14,7 +14,7 @@ curl -fL --proto '=https' --proto-redir '=https' \
 1. 从 GitHub Release 下载 `AnyPaste-macos.zip` 与 `.sha256`
 2. 校验 SHA-256(**不一致直接中止,不改动现有安装**)
 3. 解包并校验应用包(`plutil`、`codesign --verify`)
-4. 在 `~/Library/Keychains/anypaste-signing.keychain-db` 中准备一个**持久自签名身份**,并用它签名应用
+4. 对应用做 **ad-hoc 签名**(默认,不需要任何账号、不写钥匙串)
 5. 退出旧实例 → 原子替换 `/Applications/AnyPaste.app`(失败自动回滚)→ 注册 LaunchServices → 启动
 
 常用参数:
@@ -30,15 +30,27 @@ curl -fL --proto '=https' --proto-redir '=https' \
 
 ## 为什么不需要 Apple 开发者账号
 
-macOS 允许运行**本机自签名**的应用;只有"下载后首次运行"的公证(Gatekeeper)检查需要付费账号,而安装器会移除隔离属性(`com.apple.quarantine`)。
+macOS 允许运行**未经公证**的应用;只有"下载后首次运行"的 Gatekeeper 检查需要付费账号,而安装器会移除隔离属性(`com.apple.quarantine`)。
 
-安装器生成的证书是 10 年期自签证书,私钥保存在独立钥匙串中,密码保存在 `~/Library/Application Support/AnyPaste/`(权限 0600)。这样签名的应用具有**基于证书的 designated requirement**:
+默认使用 **ad-hoc 签名**:不涉及证书、钥匙串或密码,任何 Mac 上都能安装运行。
+
+### 关于升级后的授权
+
+ad-hoc 签名的应用,其 designated requirement 是 `cdhash H"…"`,**二进制一变就变**。因此升级到新版本后,macOS 可能要求重新勾选一次辅助功能。
+
+如果希望授权跨版本保留,可以用持久身份签名:
+
+```bash
+bash install-anypaste-macos.sh --sign local
+```
+
+它会在独立钥匙串里生成一个 10 年期自签证书并签名,requirement 变成基于证书的:
 
 ```
 identifier "com.anypaste.mac" and certificate root = H"…"
 ```
 
-而不是随每次构建变化的 `cdhash`。因此 macOS 的辅助功能授权在**升级后依然有效**,不需要每次重新勾选。
+代价是安装时需要**输入一次登录密码**(macOS 要求把该证书加入用户信任设置,否则系统会拒绝授予辅助功能)。
 
 首次安装后 macOS 仍会要求一次辅助功能授权(这是系统对"模拟按键"的硬性要求,无法绕过):
 

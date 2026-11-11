@@ -23,7 +23,7 @@ MIN_MACOS_MAJOR=13
 
 PREFIX="/Applications"
 LAUNCH=1
-SIGN_MODE="auto"      # auto | local | adhoc
+SIGN_MODE="adhoc"     # adhoc (default, works everywhere) | local (persistent identity)
 LANG_MODE="auto"
 LOCAL_SOURCE=""
 MODE="install"
@@ -40,8 +40,8 @@ msg() {
     local en cn
     case "$key" in
         usage)
-            en="Usage: install-anypaste-macos.sh [--no-launch] [--prefix DIR] [--sign auto|local|adhoc] [--app PATH] [--uninstall] [--lang en|zh-CN] [--help]"
-            cn="用法:install-anypaste-macos.sh [--no-launch] [--prefix 目录] [--sign auto|local|adhoc] [--app 本地.app或zip] [--uninstall] [--lang en|zh-CN] [--help]"
+            en="Usage: install-anypaste-macos.sh [--no-launch] [--prefix DIR] [--sign adhoc|local] [--app PATH] [--uninstall] [--lang en|zh-CN] [--help]"
+            cn="用法:install-anypaste-macos.sh [--no-launch] [--prefix 目录] [--sign adhoc|local] [--app 本地.app或zip] [--uninstall] [--lang en|zh-CN] [--help]"
             ;;
         downloading)
             en="[1/5] Downloading the latest AnyPaste build…"
@@ -313,6 +313,15 @@ EOF
     security set-key-partition-list -S apple-tool:,apple:,codesign: \
         -s -k "$password" "$kc" >/dev/null 2>&1 || true
 
+    # macOS only grants Accessibility to apps whose signing certificate chain is
+    # trusted; user-domain trust needs the login password once.
+    if [ ! -f "$state/signing-trusted" ]; then
+        if run_with_timeout 120 security add-trusted-cert -r trustRoot -p codeSign \
+            -k "$kc" "$tmp/cert.pem" >/dev/null 2>&1; then
+            : > "$state/signing-trusted"
+        fi
+    fi
+
     printf '%s\n' "$fingerprint" > "$state/signing-identity"
     rm -rf "$tmp"
     printf '%s\n' "$fingerprint"
@@ -326,7 +335,7 @@ sign_app() {
     kc=$(keychain_path)
     state=$(state_dir)
 
-    if [ "$SIGN_MODE" != "adhoc" ]; then
+    if [ "$SIGN_MODE" = "local" ]; then
         if fingerprint=$(ensure_identity) && [ -n "$fingerprint" ]; then
             if run_with_timeout 90 codesign --force --sign "$fingerprint" --keychain "$kc" \
                 --identifier "$BUNDLE_ID" --timestamp=none "$app" >/dev/null 2>&1; then
@@ -337,10 +346,8 @@ sign_app() {
                 fi
             fi
         fi
-        if [ "$SIGN_MODE" = "local" ]; then
-            return 1
-        fi
         warn adhoc_fallback
+        return 1
     fi
 
     run_with_timeout 60 codesign --force --deep --sign - "$app" >/dev/null 2>&1 || return 1
