@@ -354,7 +354,9 @@ sign_app() {
     state=$(state_dir)
 
     if [ "$SIGN_MODE" = "local" ]; then
-        if fingerprint=$(ensure_identity) && [ -n "$fingerprint" ]; then
+        # Only use the certificate once the user actually trusted it; an
+        # untrusted self-signed app is refused by TCC and cannot type at all.
+        if fingerprint=$(ensure_identity) && [ -n "$fingerprint" ] && [ -f "$state/signing-trusted" ]; then
             if run_with_timeout 90 codesign --force --sign "$fingerprint" --keychain "$kc" \
                 --identifier "$BUNDLE_ID" --timestamp=none "$app" >/dev/null 2>&1; then
                 if run_with_timeout 60 codesign --verify --deep --strict "$app" >/dev/null 2>&1; then
