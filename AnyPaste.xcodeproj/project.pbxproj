@@ -11,6 +11,7 @@
 		017CC6F86454321D6D579F43 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783EC7CAE7D0D0D827FDEDBF /* AppDelegate.swift */; };
 		EFF67E3EC0D160CC5FCB4AC0 /* AppMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B32428270384A94BD6E930F /* AppMenu.swift */; };
 		CCA6A2AF748A8583259AD23D /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55CE6D68B6A6570A44996E7 /* AppInfo.swift */; };
+		6569B0A61570DFCBCD2FC19D /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 870EA5F3F8178C354B6FB728 /* UpdateChecker.swift */; };
 		8653994DE17AF3E6CBBD92FD /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643EB42C40AEAD790C5FACF1 /* Prefs.swift */; };
 		CBE5893751F372710E8C8F45 /* KeyboardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0994620972F3F687CE7995C8 /* KeyboardLayout.swift */; };
 		EC5B8D374F45F5C520FDBEEB /* KeystrokePlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374ABDC3424A4E157243A3F2 /* KeystrokePlanner.swift */; };
@@ -37,6 +38,7 @@
 		783EC7CAE7D0D0D827FDEDBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1B32428270384A94BD6E930F /* AppMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMenu.swift; sourceTree = "<group>"; };
 		B55CE6D68B6A6570A44996E7 /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
+		870EA5F3F8178C354B6FB728 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		643EB42C40AEAD790C5FACF1 /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		0994620972F3F687CE7995C8 /* KeyboardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardLayout.swift; sourceTree = "<group>"; };
 		374ABDC3424A4E157243A3F2 /* KeystrokePlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeystrokePlanner.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				B55CE6D68B6A6570A44996E7 /* AppInfo.swift */,
+				870EA5F3F8178C354B6FB728 /* UpdateChecker.swift */,
 				643EB42C40AEAD790C5FACF1 /* Prefs.swift */,
 				0994620972F3F687CE7995C8 /* KeyboardLayout.swift */,
 				374ABDC3424A4E157243A3F2 /* KeystrokePlanner.swift */,
@@ -216,6 +219,7 @@
 				017CC6F86454321D6D579F43 /* AppDelegate.swift in Sources */,
 				EFF67E3EC0D160CC5FCB4AC0 /* AppMenu.swift in Sources */,
 				CCA6A2AF748A8583259AD23D /* AppInfo.swift in Sources */,
+				6569B0A61570DFCBCD2FC19D /* UpdateChecker.swift in Sources */,
 				8653994DE17AF3E6CBBD92FD /* Prefs.swift in Sources */,
 				CBE5893751F372710E8C8F45 /* KeyboardLayout.swift in Sources */,
 				EC5B8D374F45F5C520FDBEEB /* KeystrokePlanner.swift in Sources */,

@@ -6,10 +6,12 @@ removing a Swift file only requires re-running this script.
 """
 import hashlib
 import os
+import plistlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APP_DIR = os.path.join(ROOT, "AnyPaste")
 PROJECT_DIR = os.path.join(ROOT, "AnyPaste.xcodeproj")
+INFO_PLIST = os.path.join(APP_DIR, "Info.plist")
 
 BUNDLE_ID = "com.anypaste.mac"
 PRODUCT = "AnyPaste"
@@ -18,6 +20,7 @@ GROUPS = {
     "App": ["main.swift", "AppDelegate.swift", "AppMenu.swift"],
     "Core": [
         "AppInfo.swift",
+        "UpdateChecker.swift",
         "Prefs.swift",
         "KeyboardLayout.swift",
         "KeystrokePlanner.swift",
@@ -59,6 +62,20 @@ def main():
             missing.append(path)
     if missing:
         raise SystemExit("missing files:\n  " + "\n  ".join(missing))
+
+    # Info.plist is the single source of truth for the user-visible version and
+    # build number; the generated project must not drift from it.
+    try:
+        with open(INFO_PLIST, "rb") as handle:
+            info_plist = plistlib.load(handle)
+    except (OSError, plistlib.InvalidFileException) as error:
+        raise SystemExit("cannot read %s: %s" % (INFO_PLIST, error))
+    marketing_version = info_plist.get("CFBundleShortVersionString")
+    build_version = info_plist.get("CFBundleVersion")
+    if not isinstance(marketing_version, str) or not marketing_version:
+        raise SystemExit("missing CFBundleShortVersionString in %s" % INFO_PLIST)
+    if not isinstance(build_version, str) or not build_version.isdigit() or int(build_version) <= 0:
+        raise SystemExit("CFBundleVersion must be a positive integer in %s" % INFO_PLIST)
 
     ids = {}
     ids["project"] = oid("project")
@@ -311,7 +328,7 @@ def main():
         "CODE_SIGNING_ALLOWED = NO;",
         "CODE_SIGNING_REQUIRED = NO;",
         "COMBINE_HIDPI_IMAGES = YES;",
-        "CURRENT_PROJECT_VERSION = 9;",
+        "CURRENT_PROJECT_VERSION = %s;" % build_version,
         "ENABLE_HARDENED_RUNTIME = NO;",
         "GENERATE_INFOPLIST_FILE = NO;",
         "INFOPLIST_FILE = AnyPaste/Info.plist;",
@@ -319,7 +336,7 @@ def main():
         "\t\t\t\t\t\"$(inherited)\",",
         "\t\t\t\t\t\"@executable_path/../Frameworks\",",
         "\t\t\t\t);",
-        "MARKETING_VERSION = 1.1.0;",
+        "MARKETING_VERSION = %s;" % marketing_version,
         "PRODUCT_BUNDLE_IDENTIFIER = %s;" % BUNDLE_ID,
         "PRODUCT_NAME = %s;" % PRODUCT,
         "SWIFT_EMIT_LOC_STRINGS = NO;",

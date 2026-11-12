@@ -64,7 +64,9 @@ macOS 的辅助功能授权(TCC)记录的是应用的 **designated requirement**
 
 ## 更新
 
-重复执行同一条安装命令即可。安装器会:
+重复执行同一条安装命令即可。也可以在应用内打开 设置 → 权限与诊断 → 检查更新:发现新版本时会显示 GitHub Release 入口,复制安装命令重跑即可。
+
+安装器会:
 
 - 复用已有的签名身份,不创建新证书;
 - 用已保存的 requirement 校验新 app;
@@ -132,7 +134,7 @@ bash install-anypaste-macos.sh --uninstall
 - 安装脚本随 Release 以明文分发([dist/install-anypaste-macos.sh](../dist/install-anypaste-macos.sh)),可逐行审阅
 - 下载内容在解包前先做 SHA-256 校验
 - 私钥保存在登录钥匙串;只有 `/usr/bin/codesign` 被授权使用;信任仅限用户域 code signing
-- 应用本身不联网、不采集数据;仅在按下热键时读取剪贴板文本
+- 应用不采集数据;只有在你点击「检查更新」时访问 GitHub 公开 API 查询版本号,平时不联网;仅在按下热键时读取剪贴板文本
 - 日志只写本机 `~/Library/Logs/AnyPaste/anypaste.log`,不含剪贴板内容
 - 未做 Apple 公证;自签证书不是 Developer ID 签名
 
@@ -149,6 +151,6 @@ bash install-anypaste-macos.sh --uninstall
 | 安装提示多个 AnyPaste 身份 | 在“钥匙串访问”中删除多余证书;或 `--reset-identity` 重建 |
 | 签名身份损坏 / 中断 | 运行 `bash install-anypaste-macos.sh --reset-identity`;会重建身份并需要重新授权一次 |
 | 更新后仍不能输入文字 | 确认用安装器更新且 `codesign -d -r-` 显示证书 requirement;运行 `AnyPaste --self-test` 看 `axTrusted`;必要时移除后重新添加辅助功能 |
-| 输入丢字 | 把每字延迟调到 5–10 ms(远程桌面、Electron 应用常见) |
+| 输入丢字 | 默认 5 ms;仍丢字时把每字延迟调到 10 ms 左右(远程桌面、Electron 应用常见) |
 | 菜单栏看不到图标 | 系统限制;应用会自动在 Dock 显示入口(系统恢复后自动切回),详见 README「已知限制」 |
 | 想看诊断 | `Settings → 权限与诊断 → 运行自检`,或终端执行 `AnyPaste --self-test` |

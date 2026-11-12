@@ -87,6 +87,33 @@ enum Diagnostics {
         let settings = AppSettings.shared
         add("prefs.hotkey", settings.hotKey.isUsable, "当前热键=\(settings.hotKey.displayString)")
 
+        // Version display contract: Settings explains both numbers, so both must
+        // stay parseable and a build number must remain a positive integer.
+        let parsedBuild = Int(AppInfo.build) ?? 0
+        add(
+            "version.parse",
+            VersionNumber(AppInfo.version) != nil && parsedBuild > 0,
+            "发布版本=\(AppInfo.version),构建号=\(AppInfo.build)"
+        )
+
+        // Update comparison is pure logic; the self-test never touches the network.
+        let compareCaseList: [(latest: String, current: String, expected: Bool)] = [
+            ("1.2.0", "1.1.0", true),
+            ("1.10.0", "1.9.9", true),
+            ("v1.1.0", "1.1.0", false),
+            ("1.1", "1.1.0", false),
+            ("1.1.9", "1.2.0", false),
+        ]
+        let comparesCorrectly = compareCaseList.allSatisfy {
+            UpdateChecker.isNewer(latestTag: $0.latest, than: $0.current) == $0.expected
+        }
+        let rejectsInvalidInput = UpdateChecker.isNewer(latestTag: "not-a-version", than: AppInfo.version) == nil
+        add(
+            "update.versionCompare",
+            comparesCorrectly && rejectsInvalidInput,
+            "语义化版本比较(1.10 > 1.9、v 前缀、缺省分段、非法输入)"
+        )
+
         // Hotkey registration. A registration failure caused by another running
         // instance is expected and reported as a passing skip.
         do {

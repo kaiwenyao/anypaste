@@ -108,12 +108,13 @@ This removes the app, preferences, logs, `~/Library/Application Support/AnyPaste
 | Pause / resume the hotkey | Menu bar → Enable Hotkey |
 | Open Settings | Menu bar icon → Settings… |
 | Permissions and onboarding | Menu bar → Permissions & Onboarding… |
+| Check for updates | Settings → Permissions & Diagnostics → Check for Updates |
 | Close the current window | `⌘W` while an AnyPaste window is focused; the app keeps running |
 | Quit AnyPaste | `⌘Q` while an AnyPaste window is focused |
 
 The app normally lives in the menu bar and has no Dock icon. Closing the current window (`⌘W`) does not quit AnyPaste; it keeps running in the menu bar. If macOS fails to present the menu bar item, AnyPaste automatically shows a Dock icon as a fallback; clicking that icon also opens Settings.
 
-The hotkey, per-character delay (0–20 ms, default 1 ms), menu bar progress, and launch-at-login option are all in Settings. The default hotkey is `⌃⇧V`; record a different one on the Hotkey tab. If the combination is already taken, the app reports it immediately.
+The hotkey, per-character delay (0–20 ms, default 5 ms), menu bar progress, and launch-at-login option are all in Settings. The default hotkey is `⌃⇧V`; record a different one on the Hotkey tab. If the combination is already taken, the app reports it immediately.
 
 > The app UI is currently in Simplified Chinese; menu and settings labels in this README are translations.
 
@@ -135,7 +136,7 @@ The hotkey, per-character delay (0–20 ms, default 1 ms), menu bar progress, an
 
 - **Raw semantics**: `{}`, `^+!`, `%`, and similar characters are typed literally and never interpreted; newline = Return, Tab = Tab, and a backspace character is sent as Delete.
 - **Real key codes + Unicode fallback**: characters the current keyboard layout can produce are sent with real key codes, which keeps input working in apps that only look at the virtual key code. Chinese, Japanese, Korean, emoji, and other characters the layout cannot produce are injected as Unicode.
-- **Adjustable speed**: 0–20 ms per character (default 1 ms). Increase it when a remote desktop or Electron app drops characters.
+- **Adjustable speed**: 0–20 ms per character (default 5 ms). Increase it when a remote desktop or Electron app drops characters.
 - **Stop anytime**: `Esc` or the menu bar → Stop Typing; progress is shown in the menu bar by default.
 - **Long text**: typed serially in the background with no hard length limit; the time depends on the text length and delay.
 - **One job at a time**: triggering again while typing is ignored; nothing is queued or duplicated.
@@ -147,6 +148,7 @@ The hotkey, per-character delay (0–20 ms, default 1 ms), menu bar progress, an
 - Accessibility onboarding with live status; secure input (password fields) is reported instead of silently failing.
 - Launch at login (`SMAppService`); keep the app in `/Applications`, otherwise macOS may report that the login item was not found.
 - Built-in diagnostics: `--self-test` / `--e2e-test`, plus a one-click self-test and copyable report in Settings.
+- Manual update check in Settings: when a newer release exists, it shows a GitHub button; copy the install command and re-run it to update. It compares release versions only and never downloads, installs, or polls in the background.
 
 **Native**
 
@@ -185,7 +187,7 @@ AnyPaste does not modify the pasteboard or invoke system paste. One typing run l
 
 ## Privacy and security
 
-- **The app itself does not use the network**: no account, telemetry, auto-update, or upload logic. Only the installer downloads the release from GitHub.
+- **The app never accesses the network on its own**: no account, telemetry, auto-update, or upload logic. Only when you press Check for Updates does the app query GitHub's public API for the latest release tag; it sends no clipboard contents or user data. The installer is what downloads the release.
 - **During normal use, the clipboard is read only when you ask for typing**: on `⌃⇧V` or the "Type Clipboard Now" menu item. No history is saved and there is no background clipboard monitoring.
 - **Logs do not contain clipboard text**: logs live at `~/Library/Logs/AnyPaste/anypaste.log`; during normal typing they record events such as launch, hotkey, permission, and character counts. Self-test records only clipboard types and length.
 - **Local signing identity**: the installer creates an `AnyPaste Local Signing` certificate and private key in your login Keychain. Only `/usr/bin/codesign` is authorized to use the key, and the certificate is trusted only for the user-level code signing policy, not as a system root. Uninstall removes it.
@@ -198,7 +200,7 @@ AnyPaste does not modify the pasteboard or invoke system paste. One typing run l
 |---|---|
 | `⌃⇧V` does nothing | Check that AnyPaste is enabled in System Settings → Privacy & Security → Accessibility; Settings → Permissions & Diagnostics shows the live status |
 | It is checked but the app still says it is not authorized | Quit and reopen AnyPaste first; if that fails, restart or log in again. If you just updated, remove AnyPaste with the minus button and add it again |
-| Characters are dropped or out of order | Raise the per-character delay to 5–10 ms (common with remote desktops and Electron apps) |
+| Characters are dropped or out of order | The default is 5 ms; raise the per-character delay to around 10 ms (common with remote desktops and Electron apps) |
 | Cannot type after updating from an old version | The ad-hoc → persistent-identity migration needs one final approval; later updates keep it. Confirm you updated with the installer (not by dragging the app) and check `axTrusted` in `AnyPaste --self-test` |
 | Keychain access / trust prompt during install | That is the one-time creation of the local signing identity; allow it. If you deny it, the install stops and the current app is left untouched |
 | The signing identity is missing or broken | Re-run the installer with `--reset-identity` (requires one re-grant). Restoring the original certificate/key is preferable because it keeps the grant |
@@ -236,7 +238,16 @@ python3 Scripts/gen_project.py
 
 For development with a persistent Accessibility grant, install with `Scripts/install_local.sh` (it goes through the installer and reuses the local identity). Opening the app under `build/` directly keeps the ad-hoc signature, so a rebuild requires re-granting.
 
-Maintainer release: `Scripts/release.sh <version>` (requires an authenticated `gh`).
+Maintainer release: bump `CFBundleShortVersionString` / `CFBundleVersion` in `AnyPaste/Info.plist`, run `python3 Scripts/gen_project.py`, then run `Scripts/release.sh <version>` (requires an authenticated `gh`). The release script refuses a tag that does not match the app version.
+
+### Version numbers
+
+Settings → Permissions & Diagnostics shows `v1.1.0 (9)`:
+
+- `1.1.0` is the **release version** (`CFBundleShortVersionString`) and matches the GitHub Release tag (`v1.1.0`). The update check compares only this value.
+- `(9)` is the **build number** (`CFBundleVersion`). It increments with every package and distinguishes builds of the same release.
+
+Bump both values for a new release, regenerate the project, and publish as described above.
 
 ### Verification
 
@@ -265,7 +276,7 @@ GitHub Actions runs the same script for pull requests and `main`.
 | Path | Contents |
 |---|---|
 | `AnyPaste/App/` | `main.swift`, `AppDelegate.swift` (including `--self-test` / `--e2e-test`) |
-| `AnyPaste/Core/` | Hotkey, keyboard layout, typing engine, permissions, preferences, diagnostics |
+| `AnyPaste/Core/` | Hotkey, keyboard layout, typing engine, permissions, preferences, diagnostics, update check |
 | `AnyPaste/UI/` | Menu bar, Settings, onboarding, HUD |
 | `AnyPaste/Resources/` | App icon |
 | `AnyPaste/Info.plist` | Bundle metadata, version, `LSUIElement` |

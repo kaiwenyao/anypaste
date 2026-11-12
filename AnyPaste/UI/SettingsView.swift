@@ -39,10 +39,11 @@ struct GeneralSettingsTab: View {
                         .foregroundStyle(controller.permissionGranted ? Color.green : Color.orange)
                     Text(controller.statusText)
                     Spacer()
-                    Text("v\(AppInfo.version)")
+                    Text("v\(AppInfo.version) (\(AppInfo.build))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
+                        .help("v\(AppInfo.version) 是发布版本号;括号里的 \(AppInfo.build) 是构建号,详见「权限与诊断」。")
                 }
 
                 if !controller.permissionGranted {
@@ -96,7 +97,7 @@ struct GeneralSettingsTab: View {
                             .monospacedDigit()
                             .frame(width: 52, alignment: .trailing)
                     }
-                    Text("远端桌面或 Electron 应用偶尔丢字时,把延迟调大(例如 5–10 ms)。")
+                    Text("默认 5 ms;远端桌面或 Electron 应用仍丢字时,可调到 10 ms 左右。")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -137,8 +138,10 @@ struct GeneralSettingsTab: View {
 
 struct PermissionSettingsTab: View {
     @EnvironmentObject private var controller: AppController
+    @ObservedObject private var updater = UpdateChecker.shared
     @State private var reportText = ""
     @State private var isRunning = false
+    @State private var copiedInstallCommand = false
 
     private let refreshTimer = Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()
 
@@ -179,13 +182,29 @@ struct PermissionSettingsTab: View {
                     Text(KeyboardLayout.shared.displayName)
                         .foregroundStyle(.secondary)
                 }
-                HStack {
-                    Text("版本")
-                    Spacer()
-                    Text("v\(AppInfo.version) (\(AppInfo.build))")
-                        .foregroundStyle(.secondary)
-                        .monospacedDigit()
+            }
+
+            Section("版本与更新") {
+                LabeledContent("版本") {
+                    HStack(spacing: 8) {
+                        Text("v\(AppInfo.version) (\(AppInfo.build))")
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                        Button(updater.isChecking ? "检查中…" : "检查更新") {
+                            updater.check()
+                        }
+                        .disabled(updater.isChecking)
+                    }
                 }
+
+                Text("\(AppInfo.version) 是发布版本号(主版本.次版本.修订号),与 GitHub Release 的 tag 对应;"
+                     + "括号里的 \(AppInfo.build) 是构建号(build),每次打包递增,"
+                     + "用于区分同一发布版本的不同构建。检查更新只比较发布版本号。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                updateStatus
             }
 
             Section("诊断") {
@@ -220,6 +239,86 @@ struct PermissionSettingsTab: View {
         .onReceive(refreshTimer) { _ in
             controller.refreshPermission()
         }
+    }
+
+    @ViewBuilder
+    private var updateStatus: some View {
+        switch updater.phase {
+        case .idle:
+            EmptyView()
+
+        case .checking:
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("正在从 GitHub 查询最新版本…")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+            }
+
+        case .upToDate(let latest):
+            Label("已是最新版本(GitHub 最新 v\(latest))。", systemImage: "checkmark.circle.fill")
+                .font(.caption)
+                .foregroundStyle(.green)
+
+        case .updateAvailable(let latest, let pageURL):
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.down.circle.fill")
+                        .foregroundStyle(.blue)
+                    Text("发现新版本 v\(latest) (当前 v\(AppInfo.version))")
+                        .fontWeight(.medium)
+                    Spacer()
+                }
+
+                HStack(spacing: 8) {
+                    Button("打开 GitHub") {
+                        openReleasePage(pageURL)
+                    }
+                    Button(copiedInstallCommand ? "已复制" : "复制安装命令") {
+                        copyInstallCommand()
+                    }
+                    Spacer()
+                }
+
+                Text("在 GitHub 页面复制安装命令,或点「复制安装命令」后粘贴到终端运行;"
+                     + "升级会复用本地签名身份,辅助功能授权保持不变。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+        case .failed(let message):
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer()
+            }
+        }
+    }
+
+    private func openReleasePage(_ url: URL) {
+        if NSWorkspace.shared.open(url) {
+            AppLog.info("打开更新页面:\(url.absoluteString)")
+        } else {
+            AppLog.error("无法打开更新页面:\(url.absoluteString)")
+            HUDWindow.show("无法打开浏览器,请手动访问 GitHub Releases")
+        }
+    }
+
+    private func copyInstallCommand() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(UpdateChecker.installCommand, forType: .string)
+        copiedInstallCommand = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            copiedInstallCommand = false
+        }
+        AppLog.info("已复制更新安装命令")
     }
 
     private func runSelfTest() {

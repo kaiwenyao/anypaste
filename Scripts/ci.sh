@@ -70,6 +70,24 @@ ui_element=$(plutil -extract LSUIElement raw "$APP/Contents/Info.plist")
     exit 1
 }
 
+version=$(plutil -extract CFBundleShortVersionString raw "$APP/Contents/Info.plist")
+if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+    echo "invalid CFBundleShortVersionString: $version" >&2
+    exit 1
+fi
+build=$(plutil -extract CFBundleVersion raw "$APP/Contents/Info.plist")
+case "$build" in
+    ''|*[!0-9]*)
+        echo "invalid CFBundleVersion: $build" >&2
+        exit 1
+        ;;
+esac
+[ "$build" -gt 0 ] || {
+    echo "CFBundleVersion must be positive: $build" >&2
+    exit 1
+}
+echo "version: $version ($build)"
+
 archs=$(lipo -archs "$BIN")
 case "$archs" in
     *arm64*x86_64*|*x86_64*arm64*) ;;

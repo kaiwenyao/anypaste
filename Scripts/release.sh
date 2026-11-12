@@ -14,12 +14,37 @@ set -Eeuo pipefail
 cd "$(dirname "$0")/.."
 
 VERSION="${1:?usage: Scripts/release.sh <version, e.g. 1.0.0>}"
+if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "version must look like 1.2.3, got: $VERSION" >&2
+    exit 1
+fi
 REPO="kaiwenyao/anypaste"
 TAG="v$VERSION"
 
 bash Scripts/build.sh
 
 APP="build/DerivedData/Build/Products/Release/AnyPaste.app"
+
+# The release tag and the version embedded in the app must agree, otherwise the
+# in-app update check would keep reporting the wrong newest version.
+APP_VERSION=$(plutil -extract CFBundleShortVersionString raw "$APP/Contents/Info.plist" 2>/dev/null || true)
+APP_BUILD=$(plutil -extract CFBundleVersion raw "$APP/Contents/Info.plist" 2>/dev/null || true)
+if [ "$APP_VERSION" != "$VERSION" ]; then
+    echo "release version $VERSION does not match the built app version ${APP_VERSION:-unknown}." >&2
+    echo "Bump CFBundleShortVersionString in AnyPaste/Info.plist, run python3 Scripts/gen_project.py, then retry." >&2
+    exit 1
+fi
+case "$APP_BUILD" in
+    ''|*[!0-9]*)
+        echo "CFBundleVersion must be a positive integer, got: ${APP_BUILD:-missing}" >&2
+        exit 1
+        ;;
+esac
+if [ "$APP_BUILD" -le 0 ]; then
+    echo "CFBundleVersion must be a positive integer, got: $APP_BUILD" >&2
+    exit 1
+fi
+
 STAGE="build/release"
 
 rm -rf "$STAGE"
@@ -66,6 +91,7 @@ curl -fL --proto '=https' --proto-redir '=https' \\
 - The installer creates a persistent local signing identity and trusts it once; the Accessibility grant is preserved across future updates (no Apple Developer account needed)
 - Updating from an older ad-hoc signed version asks for one final Accessibility approval; later updates reuse the identity
 - Update with the installer; do not drag the zip app over /Applications
+- Settings → Permissions & Diagnostics explains the version/build numbers and can check GitHub for a newer release
 - ⌘W closes the focused window without quitting; ⌘Q quits AnyPaste
 - Press ⌃⇧V to type the clipboard into any app
 EOF

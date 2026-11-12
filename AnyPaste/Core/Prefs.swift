@@ -53,6 +53,10 @@ struct HotKeyConfig: Equatable {
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
+    /// Factory default for the per-character delay. 5 ms keeps up with fast
+    /// targets (terminals, remote desktops, Electron apps) better than 1 ms.
+    static let defaultDelayMs = 5
+
     private enum Keys {
         static let enabled = "anypaste.enabled"
         static let hotKeyCode = "anypaste.hotKeyCode"
@@ -116,7 +120,7 @@ final class AppSettings: ObservableObject {
             Keys.enabled: true,
             Keys.hotKeyCode: Int(HotKeyConfig.presetControlShiftV.keyCode),
             Keys.hotKeyModifiers: Int(HotKeyConfig.presetControlShiftV.modifiers),
-            Keys.delayMs: 1,
+            Keys.delayMs: Self.defaultDelayMs,
             Keys.showProgress: true,
             Keys.completedOnboarding: false,
         ])
@@ -139,7 +143,7 @@ final class AppSettings: ObservableObject {
 
     func resetToDefaults() {
         hotKey = .presetControlShiftV
-        delayMs = 1
+        delayMs = Self.defaultDelayMs
         showProgress = true
         isEnabled = true
     }

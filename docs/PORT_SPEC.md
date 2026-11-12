@@ -23,7 +23,7 @@
 | Raw(不解释 `{}`/`^+!`/`%`) | 按 `Character`(字形簇)切分,永不解释转义 | 自检项 `mapping.raw` 覆盖 |
 | 布局可产生的字符用真实键码 | `UCKeyTranslate` 反查当前输入源 → `(keyCode, shift)` | 兼容只读 `virtualKey` 的应用 |
 | 布局不可产生的字符(中文/emoji) | 纯 Unicode 事件(keyCode 0) | 自检项 `mapping.unicode` 覆盖 |
-| 一次性高速发送 | 默认每字 1 ms,可调 0–20 ms | 远端/Electron 丢字时调大 |
+| 一次性高速发送 | 默认每字 5 ms,可调 0–20 ms | 远端/Electron 丢字时调大 |
 | AHK 托盘图标 | `NSStatusItem`;系统不呈现时自动降级为 Dock 图标 | 见 README「已知限制」 |
 | 托盘菜单 Suspend | 菜单项「启用热键」开关 | 切换会立即注册/注销热键 |
 | 无中断机制 | `Esc`(轮询键态)或菜单「停止输入」 | 输入前会等待残留的 Esc 抬起 |
@@ -38,7 +38,7 @@
 |---|---|---|
 | `anypaste.enabled` | `true` | 热键是否启用 |
 | `anypaste.hotKeyCode` / `anypaste.hotKeyModifiers` | `9` / `control+shift` | Carbon 键码与修饰位 |
-| `anypaste.delayMs` | `1` | 每字延迟(毫秒,0–20) |
+| `anypaste.delayMs` | `5` | 每字延迟(毫秒,0–20) |
 | `anypaste.showProgress` | `true` | 在菜单栏显示 `12/48` 进度 |
 | `anypaste.completedOnboarding` | `false` | 是否已看过引导 |
 
