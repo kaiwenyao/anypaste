@@ -15,7 +15,7 @@ BUNDLE_ID = "com.anypaste.mac"
 PRODUCT = "AnyPaste"
 
 GROUPS = {
-    "App": ["main.swift", "AppDelegate.swift"],
+    "App": ["main.swift", "AppDelegate.swift", "AppMenu.swift"],
     "Core": [
         "AppInfo.swift",
         "Prefs.swift",

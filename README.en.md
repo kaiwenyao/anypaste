@@ -103,8 +103,10 @@ This removes the app, preferences, logs, `~/Library/Application Support/AnyPaste
 | Pause / resume the hotkey | Menu bar → Enable Hotkey |
 | Open Settings | Menu bar icon → Settings… |
 | Permissions and onboarding | Menu bar → Permissions & Onboarding… |
+| Close the current window | `⌘W` while an AnyPaste window is focused; the app keeps running |
+| Quit AnyPaste | `⌘Q` while an AnyPaste window is focused |
 
-The app normally lives in the menu bar and has no Dock icon. If macOS fails to present the menu bar item, AnyPaste automatically shows a Dock icon as a fallback; clicking that icon also opens Settings.
+The app normally lives in the menu bar and has no Dock icon. Closing the current window (`⌘W`) does not quit AnyPaste; it keeps running in the menu bar. If macOS fails to present the menu bar item, AnyPaste automatically shows a Dock icon as a fallback; clicking that icon also opens Settings.
 
 The hotkey, per-character delay (0–20 ms, default 1 ms), menu bar progress, and launch-at-login option are all in Settings. The default hotkey is `⌃⇧V`; record a different one on the Hotkey tab. If the combination is already taken, the app reports it immediately.
 
@@ -237,7 +239,17 @@ By default this checks `/Applications/AnyPaste.app`; for a custom path:
 APP_PATH="$PWD/build/DerivedData/Build/Products/Release/AnyPaste.app" bash Scripts/verify.sh
 ```
 
-It checks the app bundle, signature, `Info.plist` contract, universal binary, `--self-test`, `--e2e-test`, a running process, and crash reports. `--e2e-test` briefly opens a test window and takes focus; both tests require Accessibility, and `--e2e-test` also needs a real GUI session, so they are not suitable for headless CI.
+It checks the app bundle, signature, `Info.plist` contract, universal binary, `--self-test`, `--e2e-test`, a running process, and crash reports. `--e2e-test` briefly opens a test window and takes focus. `--self-test` can run without Accessibility by adding `--skip-accessibility-check`; `--e2e-test` also needs a real GUI session, so it is not suitable for headless CI.
+
+Headless CI checks (build, generated-project freshness, bundle contract, menu/shortcut diagnostics):
+
+```bash
+bash Scripts/ci.sh
+```
+
+GitHub Actions runs the same script for pull requests and `main`.
+
+See [docs/STAGING.md](docs/STAGING.md) for the staged window-close/quit change and handoff checklist.
 
 ### Project layout
 

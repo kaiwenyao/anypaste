@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 struct DiagnosticsCheck: Codable {
@@ -19,12 +20,18 @@ struct DiagnosticsReport: Codable {
 /// Headless verification channel: `AnyPaste --self-test` prints this report as
 /// JSON so installation can be validated without any UI interaction.
 enum Diagnostics {
-    static func run() -> DiagnosticsReport {
+    /// - Parameter requireAccessibility: pass `false` in headless CI, where the
+    ///   runner cannot grant Accessibility. The report still records the real
+    ///   trust state; only the permission check is treated as not applicable.
+    static func run(requireAccessibility: Bool = true) -> DiagnosticsReport {
         var checks: [DiagnosticsCheck] = []
 
         func add(_ name: String, _ ok: Bool, _ detail: String) {
             checks.append(DiagnosticsCheck(name: name, ok: ok, detail: detail))
         }
+
+        // Menu contracts: ⌘W must close the key window, ⌘Q must terminate.
+        checks.append(contentsOf: shortcutChecks())
 
         // Keystroke planning: these cover every translation rule in the planner.
         let layout = KeyboardLayout.shared
@@ -102,7 +109,11 @@ enum Diagnostics {
         )
 
         let trusted = PermissionService.isAccessibilityTrusted
-        add("permission.accessibility", trusted, trusted ? "已授权" : "未授权(无法向其它应用输入文字)")
+        if requireAccessibility {
+            add("permission.accessibility", trusted, trusted ? "已授权" : "未授权(无法向其它应用输入文字)")
+        } else {
+            add("permission.accessibility", true, "跳过:CI 不要求辅助功能(实际=\(trusted))")
+        }
         add(
             "permission.secureInput",
             true,
@@ -118,6 +129,45 @@ enum Diagnostics {
             axTrusted: trusted,
             checks: checks
         )
+    }
+
+    private static func shortcutChecks() -> [DiagnosticsCheck] {
+        let menu = NSApp.mainMenu ?? AppMenu.build()
+
+        let closeItem = AppMenu.item(in: menu, keyEquivalent: AppMenu.closeWindowKeyEquivalent)
+        let closeOK = closeItem.map {
+            $0.keyEquivalent == AppMenu.closeWindowKeyEquivalent
+                && $0.keyEquivalentModifierMask == .command
+                && $0.action == #selector(NSWindow.performClose(_:))
+                && $0.target == nil
+        } ?? false
+        let closeDetail = closeOK
+            ? "⌘W → performClose:(nil target,关闭当前窗口)"
+            : "缺少 ⌘W → performClose: 菜单项"
+
+        let quitItem = AppMenu.item(in: menu, keyEquivalent: AppMenu.quitKeyEquivalent)
+        let quitOK = quitItem.map {
+            $0.keyEquivalent == AppMenu.quitKeyEquivalent
+                && $0.keyEquivalentModifierMask == .command
+                && $0.action == #selector(NSApplication.terminate(_:))
+                && $0.target === NSApp
+        } ?? false
+        let quitDetail = quitOK
+            ? "⌘Q → terminate:(target=NSApp)"
+            : "缺少 ⌘Q → terminate: 菜单项"
+
+        let keepsRunning = (NSApp.delegate as? AppDelegate)?
+            .applicationShouldTerminateAfterLastWindowClosed(NSApp) == false
+
+        return [
+            DiagnosticsCheck(name: "menu.closeWindow", ok: closeOK, detail: closeDetail),
+            DiagnosticsCheck(name: "menu.quit", ok: quitOK, detail: quitDetail),
+            DiagnosticsCheck(
+                name: "window.closeKeepsAppRunning",
+                ok: keepsRunning,
+                detail: keepsRunning ? "关闭最后一个窗口后进程继续运行" : "关闭最后一个窗口会退出应用"
+            ),
+        ]
     }
 
     static func encode(_ report: DiagnosticsReport) -> String {
