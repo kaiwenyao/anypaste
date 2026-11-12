@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		447DE4F0F68D67F517D07EBF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1196C54B1BFF87C82479D22A /* main.swift */; };
 		017CC6F86454321D6D579F43 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783EC7CAE7D0D0D827FDEDBF /* AppDelegate.swift */; };
+		EFF67E3EC0D160CC5FCB4AC0 /* AppMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B32428270384A94BD6E930F /* AppMenu.swift */; };
 		CCA6A2AF748A8583259AD23D /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55CE6D68B6A6570A44996E7 /* AppInfo.swift */; };
 		8653994DE17AF3E6CBBD92FD /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643EB42C40AEAD790C5FACF1 /* Prefs.swift */; };
 		CBE5893751F372710E8C8F45 /* KeyboardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0994620972F3F687CE7995C8 /* KeyboardLayout.swift */; };
@@ -34,6 +35,7 @@
 		4D815DD2BB41FEA1DA45DC65 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1196C54B1BFF87C82479D22A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		783EC7CAE7D0D0D827FDEDBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1B32428270384A94BD6E930F /* AppMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMenu.swift; sourceTree = "<group>"; };
 		B55CE6D68B6A6570A44996E7 /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
 		643EB42C40AEAD790C5FACF1 /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		0994620972F3F687CE7995C8 /* KeyboardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardLayout.swift; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 			children = (
 				1196C54B1BFF87C82479D22A /* main.swift */,
 				783EC7CAE7D0D0D827FDEDBF /* AppDelegate.swift */,
+				1B32428270384A94BD6E930F /* AppMenu.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -211,6 +214,7 @@
 			files = (
 				447DE4F0F68D67F517D07EBF /* main.swift in Sources */,
 				017CC6F86454321D6D579F43 /* AppDelegate.swift in Sources */,
+				EFF67E3EC0D160CC5FCB4AC0 /* AppMenu.swift in Sources */,
 				CCA6A2AF748A8583259AD23D /* AppInfo.swift in Sources */,
 				8653994DE17AF3E6CBBD92FD /* Prefs.swift in Sources */,
 				CBE5893751F372710E8C8F45 /* KeyboardLayout.swift in Sources */,

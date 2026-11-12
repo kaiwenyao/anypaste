@@ -103,8 +103,10 @@ bash Scripts/uninstall.sh
 | 暂停 / 恢复热键 | 菜单栏 → 启用热键 |
 | 打开设置 | 菜单栏图标 → 设置… |
 | 权限与引导 | 菜单栏 → 权限与引导… |
+| 关闭当前窗口 | `⌘W`（AnyPaste 窗口聚焦时；应用继续运行） |
+| 退出 AnyPaste | `⌘Q`（AnyPaste 窗口聚焦时） |
 
-默认只驻留菜单栏，不显示 Dock 图标。若系统没有呈现菜单栏图标，应用会自动在 Dock 显示备用入口；此时点击 Dock 图标也能打开设置。
+默认只驻留菜单栏，不显示 Dock 图标。关闭窗口（`⌘W`）不会退出应用；AnyPaste 会继续驻留菜单栏。若系统没有呈现菜单栏图标，应用会自动在 Dock 显示备用入口；此时点击 Dock 图标也能打开设置。
 
 快捷键、每字延迟（0–20 ms，默认 1 ms）、菜单栏进度、开机启动都在设置里调整。默认热键是 `⌃⇧V`，可在「快捷键」页录制修改；组合被占用时会立即提示。
 
@@ -235,7 +237,17 @@ bash Scripts/verify.sh
 APP_PATH="$PWD/build/DerivedData/Build/Products/Release/AnyPaste.app" bash Scripts/verify.sh
 ```
 
-会检查应用包、签名、`Info.plist` 契约、通用二进制、`--self-test`、`--e2e-test`、进程存活和崩溃报告。`--e2e-test` 会短暂弹出测试窗口并获取焦点；两项测试都需要辅助功能权限，`--e2e-test` 还依赖真实 GUI 会话，因此都不适合无头 CI。
+会检查应用包、签名、`Info.plist` 契约、通用二进制、`--self-test`、`--e2e-test`、进程存活和崩溃报告。`--e2e-test` 会短暂弹出测试窗口并获取焦点；`--self-test` 可用 `--skip-accessibility-check` 在无辅助功能权限的无头环境运行，`--e2e-test` 还依赖真实 GUI 会话，因此不适合无头 CI。
+
+无头 CI 检查（构建、工程文件同步、bundle 契约、菜单快捷键诊断）：
+
+```bash
+bash Scripts/ci.sh
+```
+
+GitHub Actions 会在 PR 和 `main` 分支上运行同一脚本。
+
+本次「窗口关闭 / 退出」暂存改动的详细说明与接手清单见 [docs/STAGING.md](docs/STAGING.md)。
 
 ### 目录结构
 

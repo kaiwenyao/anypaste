@@ -9,11 +9,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        AppMenu.install()
 
         let arguments = CommandLine.arguments
 
         if arguments.contains("--self-test") {
-            runSelfTest()
+            runSelfTest(requireAccessibility: !arguments.contains("--skip-accessibility-check"))
             return
         }
         if arguments.contains("--e2e-test") {
@@ -52,8 +53,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Headless self test
 
-    private func runSelfTest() {
-        let report = Diagnostics.run()
+    private func runSelfTest(requireAccessibility: Bool) {
+        let report = Diagnostics.run(requireAccessibility: requireAccessibility)
         Diagnostics.save(report)
         let text = Diagnostics.encode(report) + "\n"
         FileHandle.standardOutput.write(Data(text.utf8))
