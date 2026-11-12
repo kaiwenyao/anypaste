@@ -4,14 +4,33 @@
 #
 #   Scripts/verify.sh
 #
+# Momentarily quits and relaunches AnyPaste so the end-to-end test runs through
+# LaunchServices; TCC attributes Accessibility to the app, not to this shell.
+#
 set -uo pipefail
 
 APP="${APP_PATH:-/Applications/AnyPaste.app}"
 BIN="$APP/Contents/MacOS/AnyPaste"
+STATE_DIR="${ANYPASTE_STATE_DIR:-$HOME/Library/Application Support/AnyPaste}"
+LOGIN_KEYCHAIN=$(security default-keychain -d user 2>/dev/null | sed 's/^[[:space:]]*"//; s/"$//')
 failures=0
 
 pass() { printf '  \033[32mPASS\033[0m  %s\n' "$1"; }
 fail() { printf '  \033[31mFAIL\033[0m  %s\n' "$1"; failures=$((failures + 1)); }
+warn() { printf '  \033[33mWARN\033[0m  %s\n' "$1"; }
+
+quit_app() {
+    osascript -e 'tell application id "com.anypaste.mac" to quit' >/dev/null 2>&1 || true
+    local i=0
+    while pgrep -x AnyPaste >/dev/null 2>&1 && [ "$i" -lt 20 ]; do
+        sleep 0.25
+        i=$((i + 1))
+    done
+    if pgrep -x AnyPaste >/dev/null 2>&1; then
+        pkill -x AnyPaste >/dev/null 2>&1 || true
+        sleep 1
+    fi
+}
 
 echo "== AnyPaste acceptance =="
 echo "app: $APP"
@@ -26,12 +45,56 @@ else
     fail "code signature invalid"
 fi
 
-requirement=$(/usr/bin/codesign -d -r- "$APP" 2>&1 | sed -n 's/^#\{0,1\} designated => //p')
+requirement=$(/usr/bin/codesign -d -r- "$APP" 2>/dev/null | sed -n 's/^#\{0,1\}[[:space:]]*designated => //p')
 case "$requirement" in
-    *"certificate root"*) pass "signature requirement is certificate based (stable across updates)" ;;
-    *cdhash*) pass "signature requirement is ad-hoc (documented: re-grant permission after updates)" ;;
-    *) pass "signature requirement: ${requirement:-unknown}" ;;
+    *"certificate leaf"*|*"certificate root"*)
+        pass "signature requirement is certificate based (stable across updates)"
+        ;;
+    *cdhash*)
+        if [ "${ALLOW_ADHOC:-0}" = "1" ]; then
+            warn "signature requirement is ad-hoc (allowed by ALLOW_ADHOC=1; the Accessibility grant will not survive updates)"
+        else
+            fail "signature requirement is ad-hoc (run the installer without --sign adhoc)"
+        fi
+        ;;
+    *)
+        fail "signature requirement: ${requirement:-unknown}"
+        ;;
 esac
+
+# 2b. persistent local identity (what makes the grant survive updates)
+if [ -s "$STATE_DIR/signing-identity" ]; then
+    fingerprint=$(tr -d '[:space:]' < "$STATE_DIR/signing-identity")
+    if [ -n "$fingerprint" ] && [ -n "$LOGIN_KEYCHAIN" ] \
+        && security find-identity -v -p codesigning "$LOGIN_KEYCHAIN" 2>/dev/null | grep -qi "$fingerprint"; then
+        pass "signing identity $fingerprint is valid for code signing"
+    else
+        fail "signing identity ${fingerprint:-missing} is not trusted or not in the login Keychain"
+    fi
+
+    if [ -s "$STATE_DIR/signing-certificate.pem" ]; then
+        if security verify-cert -L -c "$STATE_DIR/signing-certificate.pem" -p codeSign >/dev/null 2>&1; then
+            pass "signing certificate is trusted for code signing"
+        else
+            fail "signing certificate is not trusted for code signing"
+        fi
+    else
+        warn "signing-certificate.pem is missing; cannot verify certificate trust"
+    fi
+else
+    warn "no saved signing identity at $STATE_DIR (installed by another user, or ad-hoc)"
+fi
+
+if [ -s "$STATE_DIR/signing-requirement" ]; then
+    saved_requirement=$(tr -d '\r\n' < "$STATE_DIR/signing-requirement")
+    if [ "$requirement" = "$saved_requirement" ]; then
+        pass "installed requirement matches the saved signing identity"
+    else
+        fail "installed requirement does not match the saved signing identity"
+    fi
+else
+    warn "no saved signing requirement at $STATE_DIR"
+fi
 
 # 3. Info.plist contract
 bundle_id=$(/usr/bin/plutil -extract CFBundleIdentifier raw "$APP/Contents/Info.plist" 2>/dev/null)
@@ -47,23 +110,47 @@ case "$archs" in
     *) fail "architectures: ${archs:-unknown}" ;;
 esac
 
-# 5. self test
-self_out=$("$BIN" --self-test 2>/dev/null)
-if printf '%s' "$self_out" | grep -q '"ok" : true'; then
-    pass "--self-test ok"
+# 5. functional self test. Accessibility itself is proven by the LaunchServices
+#    e2e run below: TCC attributes permission to the responsible process, and a
+#    binary launched directly from this shell is attributed to the shell, which
+#    would report axTrusted=false even when AnyPaste is allowed.
+self_out=$("$BIN" --self-test --skip-accessibility-check 2>/dev/null)
+if printf '%s' "$self_out" | grep -q '^  "ok" : true'; then
+    pass "--self-test ok (functional)"
 else
     fail "--self-test failed"
     printf '%s\n' "$self_out" | tail -20
 fi
 
-# 6. end to end typing through real CGEvent path
-e2e_out=$("$BIN" --e2e-test --delay=1 2>/dev/null)
-if printf '%s' "$e2e_out" | grep -q '"ok" : true'; then
-    pass "--e2e-test typed the sample exactly"
+# 6. end to end typing through LaunchServices (the normal app launch path).
+log_dir="$HOME/Library/Logs/AnyPaste"
+e2e_result="$log_dir/e2e-last.json"
+rm -f "$e2e_result"
+quit_app
+open "$APP" --args --e2e-test --delay=1 >/dev/null 2>&1 || true
+tries=0
+while [ ! -f "$e2e_result" ] && [ "$tries" -lt 40 ]; do
+    sleep 0.25
+    tries=$((tries + 1))
+done
+if [ -f "$e2e_result" ] && grep -q '"ok" : true' "$e2e_result"; then
+    pass "--e2e-test typed the sample exactly (via LaunchServices)"
 else
-    reason=$(printf '%s' "$e2e_out" | sed -n 's/.*"reason" : "\(.*\)".*/\1/p')
-    fail "--e2e-test failed (${reason:-no output})"
+    reason=""
+    if [ -f "$e2e_result" ]; then
+        reason=$(sed -n 's/.*"reason" : "\(.*\)".*/\1/p' "$e2e_result" | head -1)
+    fi
+    fail "--e2e-test failed (${reason:-no result file})"
+    [ -f "$e2e_result" ] && tail -10 "$e2e_result"
 fi
+
+# The e2e run exits by design; restore the normal menu-bar instance.
+open "$APP" >/dev/null 2>&1 || true
+tries=0
+while ! pgrep -x AnyPaste >/dev/null 2>&1 && [ "$tries" -lt 20 ]; do
+    sleep 0.25
+    tries=$((tries + 1))
+done
 
 # 7. running instance
 if pgrep -x AnyPaste >/dev/null 2>&1; then

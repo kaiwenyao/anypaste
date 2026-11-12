@@ -1,6 +1,8 @@
 #!/bin/bash
 #
-# Builds AnyPaste.app (universal: arm64 + x86_64) and ad-hoc signs it.
+# Builds AnyPaste.app (universal: arm64 + x86_64) and ad-hoc signs it for
+# distribution. The installer re-signs with each user's persistent local
+# identity so macOS can keep the Accessibility grant across updates.
 #
 set -Eeuo pipefail
 

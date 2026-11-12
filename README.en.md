@@ -46,33 +46,38 @@ The installer:
 
 1. Downloads the universal binary and its SHA-256 checksum from the latest Release.
 2. Verifies the checksum and app bundle; a failed check leaves the current install untouched.
-3. Applies an **ad-hoc local signature** by default — no Apple Developer account and no keychain writes.
+3. Creates (or reuses) a 10-year self-signed code-signing certificate in your **login Keychain**, adds it to the user-level **code signing trust** settings, and re-signs the downloaded app with it. No Apple Developer account is needed.
 4. Quits the old instance and replaces `/Applications/AnyPaste.app`, falling back to `~/Applications` if needed; a failed replacement rolls back.
 5. Removes the quarantine attribute, registers the app with LaunchServices, and launches it.
 
-After the first launch, open **System Settings → Privacy & Security → Accessibility** and enable **AnyPaste**. macOS requires this for synthetic keystrokes; there is no way around it.
+On the first install macOS may request Keychain access or a trust confirmation; after launch, enable **AnyPaste** in **System Settings → Privacy & Security → Accessibility**. These are one-time steps.
+
+**Updating from 1.0.x (ad-hoc signed) to 1.1.0 requires one final Accessibility approval**: the old requirement is a cdhash that changes with the binary and cannot be reused. From 1.1.0 on, updates reuse the same signing identity and do not ask again.
 
 ### Signing and updates
 
 | Mode | What it provides | After an update |
 |---|---|---|
-| Default ad-hoc | No account, no password, no keychain; the ad-hoc signature is tied to the binary | macOS may ask you to re-enable Accessibility |
-| `--sign local` | Creates a 10-year self-signed certificate and trusts it for code signing; asks for your login password once | The Accessibility grant can survive updates |
+| Default (local) | A 10-year self-signed certificate in the login Keychain, trusted for code signing; may ask for Keychain/trust confirmation once | Reuses the identity; the Accessibility grant survives updates |
+| `--sign adhoc` | No Keychain writes; the signature is tied to the binary | Troubleshooting only; macOS may ask for Accessibility after every update |
 
-Repeat the same install command to update. With `--sign local`, the installer reuses the existing identity. If the certificate trust did not take effect, it falls back to ad-hoc and tells you.
+Repeat the same install command to update. The installer reuses the existing identity and verifies the new app against the saved designated requirement before replacing anything. If the identity is missing, its trust was removed, or the requirement does not match, it stops (leaving the current app untouched) instead of silently creating a new identity. Use `--reset-identity` to deliberately create a new one (requires one re-grant).
+
+> Update with the installer. Do not drag the app out of the Release zip into `/Applications`: that keeps the ad-hoc signature and loses the persistent identity. On a shared Mac, update with the macOS user who originally installed AnyPaste.
 
 ### Common options
 
 | Need | What to do |
 |---|---|
-| Keep Accessibility across updates | Add `--sign local` to the install command |
 | Do not launch after installing | Add `--no-launch` to the install command |
 | Install to a custom directory | Add `--prefix DIR` to the install command |
 | Install from a local `.app` or `.zip` | Add `--app PATH` to the install command |
+| Temporarily sign ad-hoc for troubleshooting | Add `--sign adhoc` (does not preserve the grant) |
+| Recreate the local signing identity | Add `--reset-identity` (requires one re-grant) |
 | English installer messages | Add `--lang en` to the install command |
 | Uninstall | Add `--uninstall` to the install command |
 
-Full options, signing details, and troubleshooting: [docs/INSTALL.md](docs/INSTALL.md) (currently in Chinese).
+Full options, signing mechanics, recovery, and troubleshooting: [docs/INSTALL.md](docs/INSTALL.md) (currently in Chinese).
 
 ### Uninstall
 
@@ -174,7 +179,8 @@ AnyPaste does not modify the pasteboard or invoke system paste. One typing run l
 
 - **Accessibility cannot be bypassed.** This is a macOS system restriction; AnyPaste cannot work around it.
 - **Some macOS 26/27 builds do not present new status items** (third-party menu bar apps have been observed to be affected as well). AnyPaste checks at 2, 5, 10, 20, 45, and 90 seconds after launch and again when the display configuration changes. It falls back to a Dock icon only when the item is confirmed not presented, and switches back when it detects recovery.
-- **An ad-hoc update may require re-granting Accessibility.** Use `--sign local` if you want the grant to survive updates.
+- **Updates preserve Accessibility by default.** The first install trusts the local signing certificate and grants Accessibility once; later updates reuse the identity and do not ask again. A major macOS upgrade, a reset login Keychain, a different macOS user updating the app, or deleting the identity can still require a new grant.
+- **`--sign adhoc` does not preserve the grant.** It is for troubleshooting only; macOS may ask for Accessibility again after each update.
 - **Text only.** Images, files, and rich-text formatting are not typed.
 
 ## Privacy and security
@@ -182,17 +188,20 @@ AnyPaste does not modify the pasteboard or invoke system paste. One typing run l
 - **The app itself does not use the network**: no account, telemetry, auto-update, or upload logic. Only the installer downloads the release from GitHub.
 - **During normal use, the clipboard is read only when you ask for typing**: on `⌃⇧V` or the "Type Clipboard Now" menu item. No history is saved and there is no background clipboard monitoring.
 - **Logs do not contain clipboard text**: logs live at `~/Library/Logs/AnyPaste/anypaste.log`; during normal typing they record events such as launch, hotkey, permission, and character counts. Self-test records only clipboard types and length.
+- **Local signing identity**: the installer creates an `AnyPaste Local Signing` certificate and private key in your login Keychain. Only `/usr/bin/codesign` is authorized to use the key, and the certificate is trusted only for the user-level code signing policy, not as a system root. Uninstall removes it.
 - **The installer is auditable**: it is plain Bash ([dist/install-anypaste-macos.sh](dist/install-anypaste-macos.sh)); downloads are verified against SHA-256 before unpacking.
-- **No Apple notarization**: the default ad-hoc signature is why no developer account is needed; you still grant Accessibility manually on first run, and an update may require it again.
+- **No Apple notarization**: it uses a local self-signed certificate, not Developer ID; no developer account is needed, and the first run still requires trusting the certificate and granting Accessibility.
 
 ## FAQ
 
 | Symptom | Fix |
 |---|---|
 | `⌃⇧V` does nothing | Check that AnyPaste is enabled in System Settings → Privacy & Security → Accessibility; Settings → Permissions & Diagnostics shows the live status |
-| It is checked but the app still says it is not authorized | Quit and reopen AnyPaste first; if that fails, restart or log in again (some macOS versions apply permission changes late) |
+| It is checked but the app still says it is not authorized | Quit and reopen AnyPaste first; if that fails, restart or log in again. If you just updated, remove AnyPaste with the minus button and add it again |
 | Characters are dropped or out of order | Raise the per-character delay to 5–10 ms (common with remote desktops and Electron apps) |
-| Cannot type after an update | The ad-hoc signature changes with the binary; toggle AnyPaste off and on in Accessibility, or install with `--sign local` |
+| Cannot type after updating from an old version | The ad-hoc → persistent-identity migration needs one final approval; later updates keep it. Confirm you updated with the installer (not by dragging the app) and check `axTrusted` in `AnyPaste --self-test` |
+| Keychain access / trust prompt during install | That is the one-time creation of the local signing identity; allow it. If you deny it, the install stops and the current app is left untouched |
+| The signing identity is missing or broken | Re-run the installer with `--reset-identity` (requires one re-grant). Restoring the original certificate/key is preferable because it keeps the grant |
 | No menu bar icon | A known problem on some macOS 26/27 builds; the app shows a Dock icon and switches back to the menu bar when it detects recovery |
 | Nothing happens in a password field | The system has secure input enabled and ignores synthetic keystrokes; this is a macOS limitation |
 | Hotkey conflict | Settings → Hotkey → record a new shortcut; the app reports conflicts |
@@ -219,11 +228,13 @@ open build/DerivedData/Build/Products/Release/AnyPaste.app
 bash Scripts/install_local.sh
 ```
 
-`Scripts/build.sh` builds the universal binary and applies an ad-hoc signature. `AnyPaste.xcodeproj` is generated by `Scripts/gen_project.py`; run it again after adding or removing Swift files:
+`Scripts/build.sh` builds the universal binary and applies an ad-hoc signature (release artifacts are re-signed by each user's installer). `AnyPaste.xcodeproj` is generated by `Scripts/gen_project.py`; run it again after adding or removing Swift files:
 
 ```bash
 python3 Scripts/gen_project.py
 ```
+
+For development with a persistent Accessibility grant, install with `Scripts/install_local.sh` (it goes through the installer and reuses the local identity). Opening the app under `build/` directly keeps the ad-hoc signature, so a rebuild requires re-granting.
 
 Maintainer release: `Scripts/release.sh <version>` (requires an authenticated `gh`).
 

@@ -9,6 +9,35 @@ cd "$(dirname "$0")/.."
 
 echo "== AnyPaste CI =="
 
+echo "-- shell syntax"
+for script in Scripts/*.sh dist/*.sh; do
+    bash -n "$script"
+done
+
+echo "-- installer signing contract"
+installer="dist/install-anypaste-macos.sh"
+grep -q '^SIGN_MODE="local"' "$installer" || {
+    echo "installer must default to the persistent local identity" >&2
+    exit 1
+}
+grep -q 'security add-trusted-cert' "$installer" || {
+    echo "installer must trust its certificate for code signing" >&2
+    exit 1
+}
+grep -q 'security find-identity -v -p codesigning' "$installer" || {
+    echo "installer must verify the identity is usable for code signing" >&2
+    exit 1
+}
+grep -q 'signing-requirement' "$installer" || {
+    echo "installer must save and enforce the designated requirement" >&2
+    exit 1
+}
+grep -q -- '-R "=' "$installer" || {
+    echo "installer must verify the saved requirement before replacing the app" >&2
+    exit 1
+}
+bash "$installer" --help >/dev/null
+
 echo "-- generated Xcode project is current"
 project_files=(
     "AnyPaste.xcodeproj/project.pbxproj"
@@ -22,7 +51,7 @@ if [ "$before" != "$after" ]; then
     exit 1
 fi
 
-echo "-- build (universal, ad-hoc signed)"
+echo "-- build (universal, ad-hoc signed for distribution)"
 bash Scripts/build.sh
 
 APP="build/DerivedData/Build/Products/Release/AnyPaste.app"

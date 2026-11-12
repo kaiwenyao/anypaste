@@ -48,7 +48,7 @@
 |---|---|---|
 | A | 工程可构建 | `Scripts/build.sh` |
 | B | 通用二进制 | `lipo -info` |
-| C | 签名有效且 requirement 基于证书 | `codesign -d -r-` |
+| C | 签名有效,requirement 基于证书且与保存值一致 | `codesign -d -r-`;`Scripts/verify.sh` |
 | D | Info.plist 契约 | `plutil -extract` |
 | E | 热键注册/注销 | `--self-test` 的 `hotkey.*` |
 | F | 键位映射(换行/Tab/ASCII/Raw/Unicode) | `--self-test` 的 `mapping.*` |
@@ -57,6 +57,7 @@
 | I | 进程存活、无崩溃 | `ps` / `DiagnosticReports` |
 | J | 菜单栏或 Dock 入口可见 | 截图 |
 | K | 窗口快捷键:⌘W 关闭当前窗口且不退出,⌘Q 退出 | `--self-test` 的 `menu.*` / `window.closeKeepsAppRunning`;手测 |
+| L | 升级后辅助功能授权保留 | 手测:安装 build A → 授予辅助功能 → 安装 build B → `--e2e-test` 不重新授权 |
 
 ## 边界情况
 
