@@ -58,7 +58,7 @@ identifier "com.anypaste.mac" and certificate root = H"…"
 
 ## 更新
 
-重复执行同一条安装命令即可。安装器复用同一签名身份,并在替换前校验旧 requirement 是否一致。
+重复执行同一条安装命令即可。使用 `--sign local` 时会复用已有签名身份;替换前会校验新包签名,替换失败自动回滚。默认 ad-hoc 签名在升级后可能需要重新授权。
 
 ## 卸载
 
