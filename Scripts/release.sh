@@ -50,7 +50,7 @@ curl -fL --proto '=https' --proto-redir '=https' \\
 
 - Universal binary (Apple Silicon + Intel), macOS 13+
 - Signed locally on your machine at install time (no Apple Developer account needed)
-- `⌘W` closes the focused window without quitting; `⌘Q` quits AnyPaste
+- ⌘W closes the focused window without quitting; ⌘Q quits AnyPaste
 - Press ⌃⇧V to type the clipboard into any app
 EOF
 
