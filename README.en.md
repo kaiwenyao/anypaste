@@ -249,8 +249,6 @@ bash Scripts/ci.sh
 
 GitHub Actions runs the same script for pull requests and `main`.
 
-See [docs/STAGING.md](docs/STAGING.md) for the staged window-close/quit change and handoff checklist.
-
 ### Project layout
 
 | Path | Contents |

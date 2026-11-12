@@ -247,8 +247,6 @@ bash Scripts/ci.sh
 
 GitHub Actions 会在 PR 和 `main` 分支上运行同一脚本。
 
-本次「窗口关闭 / 退出」暂存改动的详细说明与接手清单见 [docs/STAGING.md](docs/STAGING.md)。
-
 ### 目录结构
 
 | 路径 | 内容 |
