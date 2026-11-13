@@ -152,5 +152,5 @@ bash install-anypaste-macos.sh --uninstall
 | 签名身份损坏 / 中断 | 运行 `bash install-anypaste-macos.sh --reset-identity`;会重建身份并需要重新授权一次 |
 | 更新后仍不能输入文字 | 确认用安装器更新且 `codesign -d -r-` 显示证书 requirement;运行 `AnyPaste --self-test` 看 `axTrusted`;必要时移除后重新添加辅助功能 |
 | 输入丢字 | 默认 5 ms;仍丢字时把每字延迟调到 10 ms 左右(远程桌面、Electron 应用常见) |
-| 菜单栏看不到图标 | 系统限制;应用会自动在 Dock 显示入口(系统恢复后自动切回),详见 README「已知限制」 |
+| 菜单栏看不到图标 | 系统限制;Dock 图标默认可见,可在 Dock 打开设置。若已关闭 Dock 图标,应用会自动启用备用入口(系统恢复后自动切回),详见 README「已知限制」 |
 | 想看诊断 | `Settings → 权限与诊断 → 运行自检`,或终端执行 `AnyPaste --self-test` |

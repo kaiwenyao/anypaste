@@ -72,7 +72,7 @@ struct OnboardingView: View {
             Spacer(minLength: 0)
 
             HStack {
-                Text("关闭此窗口后,AnyPaste 会常驻菜单栏。")
+                Text("关闭此窗口后,AnyPaste 会常驻菜单栏并默认显示 Dock 图标(可在设置里关闭)。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()

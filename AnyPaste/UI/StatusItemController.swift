@@ -102,7 +102,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         if presented {
             AppController.shared.setMenuBarItemVisible(true)
         } else {
-            AppLog.info("菜单栏布局检测:状态项未排布,启用 Dock 图标备用入口")
+            AppLog.info("菜单栏布局检测:状态项未排布,改用 Dock 图标作为入口")
             AppController.shared.setMenuBarItemVisible(false)
         }
     }

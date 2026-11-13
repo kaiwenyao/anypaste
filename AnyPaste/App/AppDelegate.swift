@@ -8,7 +8,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var e2eMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.accessory)
+        // The activation policy (menu bar only vs. menu bar + Dock icon) is
+        // applied by AppController.start() from the saved preference, so the
+        // app no longer forces itself into agent mode here.
         AppMenu.install()
 
         let arguments = CommandLine.arguments

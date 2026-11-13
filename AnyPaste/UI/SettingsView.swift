@@ -60,7 +60,9 @@ struct GeneralSettingsTab: View {
                 }
 
                 if !controller.menuBarItemVisible {
-                    Text("当前系统未能显示菜单栏图标,已自动在 Dock 显示入口;热键与输入均不受影响。")
+                    Text(settings.showInDock
+                         ? "当前系统未能显示菜单栏图标;Dock 图标仍可作为入口。"
+                         : "当前系统未能显示菜单栏图标,已自动在 Dock 显示入口;热键与输入均不受影响。")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -103,6 +105,14 @@ struct GeneralSettingsTab: View {
                 }
 
                 Toggle("在菜单栏显示输入进度", isOn: $settings.showProgress)
+            }
+
+            Section("外观") {
+                Toggle("在 Dock 显示图标", isOn: $settings.showInDock)
+                Text("默认开启。关闭后仅在菜单栏显示;若系统未呈现菜单栏图标,应用仍会自动在 Dock 保留入口。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Section("启动") {

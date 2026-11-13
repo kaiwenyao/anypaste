@@ -24,7 +24,7 @@
 | 布局可产生的字符用真实键码 | `UCKeyTranslate` 反查当前输入源 → `(keyCode, shift)` | 兼容只读 `virtualKey` 的应用 |
 | 布局不可产生的字符(中文/emoji) | 纯 Unicode 事件(keyCode 0) | 自检项 `mapping.unicode` 覆盖 |
 | 一次性高速发送 | 默认每字 5 ms,可调 0–20 ms | 远端/Electron 丢字时调大 |
-| AHK 托盘图标 | `NSStatusItem`;系统不呈现时自动降级为 Dock 图标 | 见 README「已知限制」 |
+| AHK 托盘图标 | `NSStatusItem`;默认同时在 Dock 显示应用图标(可在设置关闭),系统不呈现菜单栏项时自动降级为 Dock 图标 | 见 README「已知限制」 |
 | 托盘菜单 Suspend | 菜单项「启用热键」开关 | 切换会立即注册/注销热键 |
 | 无中断机制 | `Esc`(轮询键态)或菜单「停止输入」 | 输入前会等待残留的 Esc 抬起 |
 | 无配置界面 | 设置窗口:通用 / 快捷键 / 权限与诊断 | 偏好写入 `UserDefaults`(`anypaste.*`) |
@@ -40,6 +40,7 @@
 | `anypaste.hotKeyCode` / `anypaste.hotKeyModifiers` | `9` / `control+shift` | Carbon 键码与修饰位 |
 | `anypaste.delayMs` | `5` | 每字延迟(毫秒,0–20) |
 | `anypaste.showProgress` | `true` | 在菜单栏显示 `12/48` 进度 |
+| `anypaste.showInDock` | `true` | 是否在 Dock 显示应用图标(关闭后仅驻留菜单栏) |
 | `anypaste.completedOnboarding` | `false` | 是否已看过引导 |
 
 ## 验收矩阵
@@ -55,7 +56,7 @@
 | G | 端到端输入(含中文/emoji/换行/Tab) | `--e2e-test` |
 | H | 跨进程热键 → 目标应用收到文本 | 手测:目标应用 + 物理 `⌃⇧V` |
 | I | 进程存活、无崩溃 | `ps` / `DiagnosticReports` |
-| J | 菜单栏或 Dock 入口可见 | 截图 |
+| J | 菜单栏入口可见;Dock 图标默认可见(可在设置关闭) | 截图 / `Scripts/verify.sh` |
 | K | 窗口快捷键:⌘W 关闭当前窗口且不退出,⌘Q 退出 | `--self-test` 的 `menu.*` / `window.closeKeepsAppRunning`;手测 |
 | L | 升级后辅助功能授权保留 | 手测:安装 build A → 授予辅助功能 → 安装 build B → `--e2e-test` 不重新授权 |
 

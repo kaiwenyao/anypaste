@@ -1,9 +1,9 @@
 import AppKit
 
-/// The application menu bar. AnyPaste is an agent app (no Dock icon), but while
-/// one of its windows is frontmost it still gets a standard menu bar. Installing
-/// an explicit main menu is what makes ⌘W and ⌘Q work: without one AppKit has
-/// nowhere to dispatch those key equivalents.
+/// The application menu bar. AnyPaste is a menu bar agent (optionally showing a
+/// Dock icon), but while one of its windows is frontmost it still gets a standard
+/// menu bar. Installing an explicit main menu is what makes ⌘W and ⌘Q work:
+/// without one AppKit has nowhere to dispatch those key equivalents.
 enum AppMenu {
     static let closeWindowKeyEquivalent = "w"
     static let quitKeyEquivalent = "q"

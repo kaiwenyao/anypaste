@@ -37,6 +37,19 @@ final class AppController: ObservableObject {
             self?.applyHotKey()
         }
 
+        NotificationCenter.default.addObserver(
+            forName: AppSettings.showInDockDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            self.applyActivationPolicy()
+            if !self.settings.showInDock && !self.menuBarItemVisible {
+                HUDWindow.show("菜单栏图标当前不可用,已保留 Dock 图标作为入口")
+            }
+        }
+
+        applyActivationPolicy()
         applyHotKey()
         startPermissionPolling()
 
@@ -47,18 +60,36 @@ final class AppController: ObservableObject {
     }
 
     /// Keeps the app reachable: a normal menu bar agent when the status item is
-    /// presented, a Dock-icon app when the system fails to present status items.
-    func setMenuBarItemVisible(_ visible: Bool) {
-        guard menuBarItemVisible != visible else { return }
-        menuBarItemVisible = visible
-        NSApp.setActivationPolicy(visible ? .accessory : .regular)
-        AppLog.info("激活策略切换为 \(visible ? "accessory(仅菜单栏)" : "regular(Dock 备用入口)")")
-        if !visible {
-            HUDWindow.show("菜单栏图标未显示,已启用 Dock 图标作为入口")
+    /// presented and the Dock icon is turned off, a Dock-icon app otherwise.
+    /// Toggling the preference or the menu bar availability both funnel through
+    /// this single policy decision.
+    func applyActivationPolicy() {
+        let wantsDock = settings.showInDock || !menuBarItemVisible
+        let policy: NSApplication.ActivationPolicy = wantsDock ? .regular : .accessory
+        guard NSApp.activationPolicy() != policy else { return }
+        guard NSApp.setActivationPolicy(policy) else {
+            AppLog.error("激活策略切换失败: \(wantsDock ? "regular" : "accessory")")
+            return
         }
+        let reason = wantsDock
+            ? (settings.showInDock ? "Dock 图标已启用" : "Dock 备用入口")
+            : "仅菜单栏"
+        AppLog.info("激活策略切换为 \(wantsDock ? "regular(\(reason))" : "accessory(\(reason))")")
         // Changing the activation policy can invalidate the Carbon hotkey
         // registration on some macOS builds, so register again.
         DispatchQueue.main.async { [weak self] in self?.applyHotKey() }
+    }
+
+    func setMenuBarItemVisible(_ visible: Bool) {
+        guard menuBarItemVisible != visible else { return }
+        menuBarItemVisible = visible
+        applyActivationPolicy()
+        // Only explain the Dock icon when it exists *because* the status item
+        // is missing; with the Dock icon already enabled there is nothing to
+        // announce.
+        if !visible && !settings.showInDock {
+            HUDWindow.show("菜单栏图标未显示,已启用 Dock 图标作为入口")
+        }
     }
 
     func startPermissionPolling() {

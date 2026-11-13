@@ -106,15 +106,15 @@ This removes the app, preferences, logs, `~/Library/Application Support/AnyPaste
 | Type the clipboard | `⌃⇧V`, or menu bar icon → Type Clipboard Now |
 | Stop typing | `Esc`, or menu bar → Stop Typing |
 | Pause / resume the hotkey | Menu bar → Enable Hotkey |
-| Open Settings | Menu bar icon → Settings… |
+| Open Settings | Menu bar icon or Dock icon → Settings… |
 | Permissions and onboarding | Menu bar → Permissions & Onboarding… |
 | Check for updates | Settings → Permissions & Diagnostics → Check for Updates |
 | Close the current window | `⌘W` while an AnyPaste window is focused; the app keeps running |
 | Quit AnyPaste | `⌘Q` while an AnyPaste window is focused |
 
-The app normally lives in the menu bar and has no Dock icon. Closing the current window (`⌘W`) does not quit AnyPaste; it keeps running in the menu bar. If macOS fails to present the menu bar item, AnyPaste automatically shows a Dock icon as a fallback; clicking that icon also opens Settings.
+By default AnyPaste lives in the menu bar and also shows a Dock icon; clicking the Dock icon opens Settings. Closing the current window (`⌘W`) does not quit AnyPaste; it keeps running. To go back to a menu-bar-only setup, turn off "Show Icon in Dock" in Settings → General. If macOS fails to present the menu bar item, AnyPaste still shows a Dock icon as a fallback even when the Dock icon preference is turned off.
 
-The hotkey, per-character delay (0–20 ms, default 5 ms), menu bar progress, and launch-at-login option are all in Settings. The default hotkey is `⌃⇧V`; record a different one on the Hotkey tab. If the combination is already taken, the app reports it immediately.
+The hotkey, per-character delay (0–20 ms, default 5 ms), menu bar progress, the Dock icon, and launch-at-login option are all in Settings. The default hotkey is `⌃⇧V`; record a different one on the Hotkey tab. If the combination is already taken, the app reports it immediately.
 
 > The app UI is currently in Simplified Chinese; menu and settings labels in this README are translations.
 
@@ -144,7 +144,7 @@ The hotkey, per-character delay (0–20 ms, default 5 ms), menu bar progress, an
 **Experience**
 
 - Record a new global hotkey in Settings; conflicts are reported immediately.
-- Menu bar first; if the system does not present the menu bar item, the app falls back to a Dock icon.
+- Menu bar first, with a Dock icon shown by default (can be turned off in Settings); if the system does not present the menu bar item, the app falls back to a Dock icon.
 - Accessibility onboarding with live status; secure input (password fields) is reported instead of silently failing.
 - Launch at login (`SMAppService`); keep the app in `/Applications`, otherwise macOS may report that the login item was not found.
 - Built-in diagnostics: `--self-test` / `--e2e-test`, plus a one-click self-test and copyable report in Settings.
@@ -180,7 +180,7 @@ AnyPaste does not modify the pasteboard or invoke system paste. One typing run l
 | Launch at login | Uses `SMAppService`; keep the app in `/Applications` |
 
 - **Accessibility cannot be bypassed.** This is a macOS system restriction; AnyPaste cannot work around it.
-- **Some macOS 26/27 builds do not present new status items** (third-party menu bar apps have been observed to be affected as well). AnyPaste checks at 2, 5, 10, 20, 45, and 90 seconds after launch and again when the display configuration changes. It falls back to a Dock icon only when the item is confirmed not presented, and switches back when it detects recovery.
+- **Some macOS 26/27 builds do not present new status items** (third-party menu bar apps have been observed to be affected as well). AnyPaste checks at 2, 5, 10, 20, 45, and 90 seconds after launch and again when the display configuration changes. It falls back to a Dock icon only when the item is confirmed not presented (no switch is needed while the Dock icon is already enabled), and switches back when it detects recovery.
 - **Updates preserve Accessibility by default.** The first install trusts the local signing certificate and grants Accessibility once; later updates reuse the identity and do not ask again. A major macOS upgrade, a reset login Keychain, a different macOS user updating the app, or deleting the identity can still require a new grant.
 - **`--sign adhoc` does not preserve the grant.** It is for troubleshooting only; macOS may ask for Accessibility again after each update.
 - **Text only.** Images, files, and rich-text formatting are not typed.
@@ -204,7 +204,7 @@ AnyPaste does not modify the pasteboard or invoke system paste. One typing run l
 | Cannot type after updating from an old version | The ad-hoc → persistent-identity migration needs one final approval; later updates keep it. Confirm you updated with the installer (not by dragging the app) and check `axTrusted` in `AnyPaste --self-test` |
 | Keychain access / trust prompt during install | That is the one-time creation of the local signing identity; allow it. If you deny it, the install stops and the current app is left untouched |
 | The signing identity is missing or broken | Re-run the installer with `--reset-identity` (requires one re-grant). Restoring the original certificate/key is preferable because it keeps the grant |
-| No menu bar icon | A known problem on some macOS 26/27 builds; the app shows a Dock icon and switches back to the menu bar when it detects recovery |
+| No menu bar icon | A known problem on some macOS 26/27 builds; the default Dock icon can still open Settings. If the Dock icon is turned off, the app enables a fallback and switches back when it detects recovery |
 | Nothing happens in a password field | The system has secure input enabled and ignores synthetic keystrokes; this is a macOS limitation |
 | Hotkey conflict | Settings → Hotkey → record a new shortcut; the app reports conflicts |
 | Clipboard contains an image or file | Only text is supported; nothing is typed and a HUD message is shown |
@@ -261,7 +261,7 @@ By default this checks `/Applications/AnyPaste.app`; for a custom path:
 APP_PATH="$PWD/build/DerivedData/Build/Products/Release/AnyPaste.app" bash Scripts/verify.sh
 ```
 
-It checks the app bundle, signature, `Info.plist` contract, universal binary, `--self-test`, `--e2e-test`, a running process, and crash reports. `--e2e-test` briefly opens a test window and takes focus. `--self-test` can run without Accessibility by adding `--skip-accessibility-check`; `--e2e-test` also needs a real GUI session, so it is not suitable for headless CI.
+It checks the app bundle, signature, `Info.plist` contract, universal binary, `--self-test`, `--e2e-test`, a running process, the Dock icon (when enabled by the preference), and crash reports. `--e2e-test` briefly opens a test window and takes focus. `--self-test` can run without Accessibility by adding `--skip-accessibility-check`; `--e2e-test` also needs a real GUI session, so it is not suitable for headless CI.
 
 Headless CI checks (build, generated-project freshness, bundle contract, menu/shortcut diagnostics):
 
@@ -279,7 +279,7 @@ GitHub Actions runs the same script for pull requests and `main`.
 | `AnyPaste/Core/` | Hotkey, keyboard layout, typing engine, permissions, preferences, diagnostics, update check |
 | `AnyPaste/UI/` | Menu bar, Settings, onboarding, HUD |
 | `AnyPaste/Resources/` | App icon |
-| `AnyPaste/Info.plist` | Bundle metadata, version, `LSUIElement` |
+| `AnyPaste/Info.plist` | Bundle metadata, version, `LSUIElement` (menu bar agent; the Dock icon is controlled by a runtime policy) |
 | `docs/` | Install notes, behavior spec, reverse-engineering report, screenshots |
 | `analysis/` | Extracted original AHK script and sample SHA-256 |
 | `Scripts/` | Build, project generation, local install, release, verification, uninstall |

@@ -65,6 +65,7 @@ final class AppSettings: ObservableObject {
         static let showProgress = "anypaste.showProgress"
         static let completedOnboarding = "anypaste.completedOnboarding"
         static let menuTriggerDelayMs = "anypaste.menuTriggerDelayMs"
+        static let showInDock = "anypaste.showInDock"
     }
 
     private let defaults: UserDefaults
@@ -90,6 +91,17 @@ final class AppSettings: ObservableObject {
         didSet { defaults.set(showProgress, forKey: Keys.showProgress) }
     }
 
+    /// Whether the app is also reachable from the Dock. On by default: the
+    /// status item alone is not reliable on every macOS build, and a Dock icon
+    /// gives the app a second, always-visible entry point.
+    @Published var showInDock: Bool {
+        didSet {
+            guard showInDock != oldValue else { return }
+            defaults.set(showInDock, forKey: Keys.showInDock)
+            NotificationCenter.default.post(name: AppSettings.showInDockDidChange, object: nil)
+        }
+    }
+
     @Published var hasCompletedOnboarding: Bool {
         didSet { defaults.set(hasCompletedOnboarding, forKey: Keys.completedOnboarding) }
     }
@@ -110,6 +122,7 @@ final class AppSettings: ObservableObject {
     @Published var launchAtLoginError: String?
 
     static let hotKeyDidChange = Notification.Name("anypaste.hotKeyDidChange")
+    static let showInDockDidChange = Notification.Name("anypaste.showInDockDidChange")
 
     private init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -123,6 +136,7 @@ final class AppSettings: ObservableObject {
             Keys.delayMs: Self.defaultDelayMs,
             Keys.showProgress: true,
             Keys.completedOnboarding: false,
+            Keys.showInDock: true,
         ])
 
         isEnabled = defaults.bool(forKey: Keys.enabled)
@@ -134,6 +148,7 @@ final class AppSettings: ObservableObject {
 
         delayMs = min(max(defaults.integer(forKey: Keys.delayMs), 0), 50)
         showProgress = defaults.bool(forKey: Keys.showProgress)
+        showInDock = defaults.bool(forKey: Keys.showInDock)
         hasCompletedOnboarding = defaults.bool(forKey: Keys.completedOnboarding)
 
         // Keep the launch-at-login switch honest about the real system state.
@@ -146,6 +161,7 @@ final class AppSettings: ObservableObject {
         delayMs = Self.defaultDelayMs
         showProgress = true
         isEnabled = true
+        showInDock = true
     }
 
     /// Delay used when typing is triggered from the menu bar: the menu needs a

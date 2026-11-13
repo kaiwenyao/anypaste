@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Standalone `NSWindow` based windows keep the app a pure menu bar agent while
+/// Standalone `NSWindow` based windows keep the app a menu bar agent while
 /// still letting Settings and onboarding come to the front predictably.
 final class SettingsWindowController {
     static let shared = SettingsWindowController()

@@ -144,7 +144,7 @@ else
     [ -f "$e2e_result" ] && tail -10 "$e2e_result"
 fi
 
-# The e2e run exits by design; restore the normal menu-bar instance.
+# The e2e run exits by design; restore the normal instance.
 open "$APP" >/dev/null 2>&1 || true
 tries=0
 while ! pgrep -x AnyPaste >/dev/null 2>&1 && [ "$tries" -lt 20 ]; do
@@ -162,6 +162,22 @@ fi
 # 8. crash reports
 crashes=$(/bin/ls -t "$HOME/Library/Logs/DiagnosticReports" 2>/dev/null | grep -c '^AnyPaste' || true)
 [ "${crashes:-0}" -eq 0 ] && pass "no crash reports" || fail "$crashes crash report(s) found"
+
+# 9. Dock entry. The app shows a Dock icon by default; a user preference may
+#    legitimately turn it off, in which case the check does not apply.
+dock_pref=$(/usr/bin/defaults read com.anypaste.mac anypaste.showInDock 2>/dev/null || true)
+if [ "$dock_pref" = "0" ] || [ "$dock_pref" = "false" ]; then
+    warn "Dock icon disabled by preference (anypaste.showInDock=false); skipped"
+else
+    sleep 1
+    asn=$(/usr/bin/lsappinfo find bundleID=com.anypaste.mac 2>/dev/null | head -1)
+    if [ -n "$asn" ] \
+        && /usr/bin/lsappinfo info -only ApplicationType "$asn" 2>/dev/null | grep -q 'type="Foreground"'; then
+        pass "Dock icon visible (activation policy regular)"
+    else
+        fail "Dock icon missing (activation policy not regular)"
+    fi
+fi
 
 echo
 if [ "$failures" -eq 0 ]; then
