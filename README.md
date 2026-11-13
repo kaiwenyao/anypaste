@@ -240,10 +240,10 @@ python3 Scripts/gen_project.py
 
 ### 版本号
 
-设置 → 权限与诊断显示 `v1.1.0 (9)`：
+设置 → 权限与诊断显示 `v1.2.0 (10)`：
 
-- `1.1.0` 是**发布版本号**（`CFBundleShortVersionString`），对应 GitHub Release 的 tag（`v1.1.0`）；检查更新只比较它。
-- `(9)` 是**构建号**（`CFBundleVersion`），每次打包递增，用来区分同一发布版本的不同构建。
+- `1.2.0` 是**发布版本号**（`CFBundleShortVersionString`），对应 GitHub Release 的 tag（`v1.2.0`）；检查更新只比较它。
+- `(10)` 是**构建号**（`CFBundleVersion`），每次打包递增，用来区分同一发布版本的不同构建。
 
 发布新版本时两个值一起递增，再按上面的步骤重新生成工程并发布。
 

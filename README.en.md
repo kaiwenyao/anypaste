@@ -242,10 +242,10 @@ Maintainer release: bump `CFBundleShortVersionString` / `CFBundleVersion` in `An
 
 ### Version numbers
 
-Settings → Permissions & Diagnostics shows `v1.1.0 (9)`:
+Settings → Permissions & Diagnostics shows `v1.2.0 (10)`:
 
-- `1.1.0` is the **release version** (`CFBundleShortVersionString`) and matches the GitHub Release tag (`v1.1.0`). The update check compares only this value.
-- `(9)` is the **build number** (`CFBundleVersion`). It increments with every package and distinguishes builds of the same release.
+- `1.2.0` is the **release version** (`CFBundleShortVersionString`) and matches the GitHub Release tag (`v1.2.0`). The update check compares only this value.
+- `(10)` is the **build number** (`CFBundleVersion`). It increments with every package and distinguishes builds of the same release.
 
 Bump both values for a new release, regenerate the project, and publish as described above.
 

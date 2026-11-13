@@ -303,7 +303,7 @@
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGNING_REQUIRED = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AnyPaste/Info.plist;
@@ -311,7 +311,7 @@
 									"$(inherited)",
 									"@executable_path/../Frameworks",
 								);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anypaste.mac;
 				PRODUCT_NAME = AnyPaste;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -325,7 +325,7 @@
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGNING_REQUIRED = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AnyPaste/Info.plist;
@@ -333,7 +333,7 @@
 									"$(inherited)",
 									"@executable_path/../Frameworks",
 								);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anypaste.mac;
 				PRODUCT_NAME = AnyPaste;
 				SWIFT_EMIT_LOC_STRINGS = NO;

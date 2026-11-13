@@ -93,6 +93,7 @@ curl -fL --proto '=https' --proto-redir '=https' \\
 - Update with the installer; do not drag the zip app over /Applications
 - Settings → Permissions & Diagnostics explains the version/build numbers and can check GitHub for a newer release
 - ⌘W closes the focused window without quitting; ⌘Q quits AnyPaste
+- AnyPaste appears in the Dock by default; turn the Dock icon off in Settings → General
 - Press ⌃⇧V to type the clipboard into any app
 EOF
 
